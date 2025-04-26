@@ -1,0 +1,576 @@
+.adminstudents-container {
+    width: 100%;
+    display: flex;
+    overflow: hidden;
+    align-items: stretch;
+    flex-direction: column;
+    justify-content: center;
+  }
+   
+  .adminstudents-report-generation-admin {
+    width: 100%;
+    height: auto;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    max-width: 1440px;
+    align-items: flex-start;
+    flex-shrink: 0;
+    background-color: rgba(255, 255, 255, 1);
+  }
+   
+  .adminstudents-navigation {
+    gap: 30px;
+    width: 310px;
+    height: 1400px;
+    display: flex;
+    overflow: hidden;
+    box-sizing: content-box;
+    align-items: center;
+    flex-shrink: 0;
+    border-color: rgba(0, 0, 0, 0.2199999988079071);
+    border-style: solid;
+    border-width: 1px;
+    flex-direction: column;
+    background-color: rgba(255, 255, 255, 1);
+  }
+   
+  .adminstudents-frame67 {
+    gap: 30px;
+    height: 573px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+   
+  .adminstudents-frame66button {
+    gap: 10px;
+    width: 310px;
+    height: 98px;
+    display: flex;
+    position: relative;
+    align-items: center;
+    flex-shrink: 0;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: rgba(133, 75, 171, 1);
+  }
+   
+  .adminstudents-logc1 {
+    top: 14px;
+    left: 20px;
+    width: 269px;
+    height: 70px;
+    position: absolute;
+  }
+   
+  .adminstudents-navlink1 {
+    display: contents;
+  }
+   
+  .adminstudents-button1 {
+    width: 223px;
+    height: 65px;
+    display: flex;
+    position: relative;
+    align-items: flex-start;
+    flex-shrink: 1;
+    border-color: #854bab;
+    border-width: 1px;
+    border-radius: 60px;
+    text-decoration: none;
+  }
+   
+  .adminstudents-dashboard-layout {
+    left: 16px;
+    width: 46px;
+    bottom: 9px;
+    height: 51px;
+    position: absolute;
+  }
+   
+  .adminstudents-text10 {
+    top: 18px;
+    left: 77px;
+    color: rgba(133, 75, 171, 1);
+    width: 121px;
+    height: auto;
+    position: absolute;
+    font-size: 20px;
+    font-style: SemiBold;
+    text-align: left;
+    font-family: Montserrat;
+    font-weight: 600;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+  }
+   
+  .adminstudents-navlink2 {
+    display: contents;
+  }
+   
+  .adminstudents-button2 {
+    width: 223px;
+    height: 65px;
+    display: flex;
+    position: relative;
+    align-items: flex-start;
+    flex-shrink: 1;
+    border-radius: 60px;
+    text-decoration: none;
+    background-color: #854bab;
+  }
+   
+  .adminstudents-student-male {
+    top: 14px;
+    left: 16px;
+    width: 41px;
+    height: 36px;
+    position: absolute;
+  }
+   
+  .adminstudents-text11 {
+    top: 21px;
+    left: 78px;
+    color: rgba(255, 255, 255, 1);
+    width: 121px;
+    height: auto;
+    position: absolute;
+    font-size: 20px;
+    font-style: SemiBold;
+    text-align: left;
+    font-family: Montserrat;
+    font-weight: 600;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+  }
+   
+  .adminstudents-button3 {
+    gap: 5px;
+    width: 223px;
+    height: 65px;
+    display: flex;
+    padding: 10px 7px;
+    align-items: center;
+    flex-shrink: 0;
+    border-color: rgba(133, 75, 171, 1);
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 60px;
+    text-decoration: none;
+    background-color: rgba(255, 255, 255, 1);
+  }
+   
+  .adminstudents-attendance {
+    width: 63px;
+    height: 45px;
+  }
+   
+  .adminstudents-text12 {
+    color: rgba(133, 75, 171, 1);
+    width: 121px;
+    height: auto;
+    font-size: 20px;
+    font-style: SemiBold;
+    text-align: left;
+    font-family: Montserrat;
+    font-weight: 600;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+  }
+   
+  .adminstudents-button4 {
+    gap: 10px;
+    width: 223px;
+    height: 65px;
+    display: flex;
+    padding: 11px 22px;
+    align-items: center;
+    flex-shrink: 0;
+    border-color: rgba(133, 75, 171, 1);
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 60px;
+    text-decoration: none;
+    background-color: rgba(255, 255, 255, 1);
+  }
+   
+  .adminstudents-quiz {
+    width: 43px;
+    height: 42px;
+  }
+   
+  .adminstudents-text13 {
+    color: rgba(133, 75, 171, 1);
+    width: 52px;
+    height: auto;
+    font-size: 20px;
+    font-style: SemiBold;
+    text-align: left;
+    font-family: Montserrat;
+    font-weight: 600;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+  }
+   
+  .adminstudents-button5 {
+    gap: 10px;
+    width: 223px;
+    height: 65px;
+    display: flex;
+    padding: 7px 20px;
+    align-items: center;
+    flex-shrink: 0;
+    border-color: rgba(133, 75, 171, 1);
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 60px;
+    text-decoration: none;
+    background-color: rgba(255, 255, 255, 1);
+  }
+   
+  .adminstudents-exam {
+    width: 48px;
+    height: 50px;
+  }
+   
+  .adminstudents-text14 {
+    color: rgba(133, 75, 171, 1);
+    width: 59px;
+    height: auto;
+    font-size: 20px;
+    font-style: SemiBold;
+    text-align: left;
+    font-family: Montserrat;
+    font-weight: 600;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+  }
+   
+  .adminstudents-frame71 {
+    gap: 10px;
+    left: 58px;
+    top: 400px;
+    width: 980px;
+    height: 982px;
+    display: flex;
+    z-index: 4;
+    position: relative;
+    align-items: flex-start;
+    border-radius: 20px;
+    background-color: rgba(181, 136, 239, 0.5);
+    border: black solid 1px;
+  }
+   
+  .adminstudents-datastud {
+    width: 940px;
+    height: 101px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 20px;
+    background-color: #ffffff;
+    margin-bottom: 15px; /* add space between students */
+  }
+  .adminsearch{
+    top: 0px;
+    left: 0px;
+    width: 780px;
+    height: 50px;
+    position: absolute;
+    border-radius: 15px;
+  }
+  .adminstudents-frame45 {
+    left: 5px;
+    width: 874px;
+    bottom: 28px;
+    height: 48px;
+    display: flex;
+    position: absolute;
+    align-items: center;
+    flex-shrink: 1;
+    justify-content: center;
+  }
+   
+  .adminstudents-test-account1 {
+    top: -9px;
+    left: 7px;
+    width: 66px;
+    height: 69px;
+    position: absolute;
+    margin-right: var(--dl-layout-space-unit);
+  }
+   
+  .adminstudents-group37 {
+    top: -4px;
+    right: 15px;
+    width: 766px;
+    height: 47px;
+    display: flex;
+    position: absolute;
+    align-items: flex-start;
+    flex-shrink: 1;
+  }
+   
+  .adminstudents-text15 {
+    color: rgba(68, 38, 88, 1);
+    width: 297px;
+    height: auto;
+    position: absolute;
+    font-size: 24px;
+    font-style: SemiBold;
+    text-align: center;
+    font-family: Montserrat;
+    font-weight: 600;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+  }
+   
+  .adminstudents-text16 {
+    top: 26px;
+    color: rgba(68, 38, 88, 1);
+    width: 175px;
+    height: auto;
+    position: absolute;
+    font-size: 24px;
+    font-style: SemiBold;
+    text-align: center;
+    font-family: Montserrat;
+    font-weight: 600;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+  }
+   
+  .adminstudents-text17 {
+    top: 3px;
+    left: 394px;
+    color: rgba(68, 38, 88, 1);
+    width: 175px;
+    height: auto;
+    position: absolute;
+    font-size: 24px;
+    font-style: SemiBold;
+    text-align: center;
+    font-family: Montserrat;
+    font-weight: 600;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+  }
+   
+  .adminstudents-back {
+    top: 27px;
+    right: 9px;
+    width: 33px;
+    height: 45px;
+    position: absolute;
+    transition: 0.3s;
+  }
+   
+  .adminstudents-back:hover {
+    transform: scale(1.08);
+  }
+   
+  .adminstudents-text18 {
+    top: 15px;
+    left: 17px;
+    color: rgba(68, 38, 88, 1);
+    width: 173px;
+    height: auto;
+    z-index: 1;
+    position: absolute;
+    font-size: 24px;
+    font-style: SemiBold;
+    text-align: center;
+    font-family: Montserrat;
+    font-weight: 600;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+  }
+   
+  .adminstudents-ellipse1 {
+    width: 1547px;
+    height: 1741px;
+    z-index: 1;
+    position: absolute;
+  }
+   
+  .adminstudents-group66 {
+    top: 28px;
+    left: 367px;
+    width: 1008px;
+    height: 70px;
+    display: flex;
+    z-index: 2;
+    position: absolute;
+    align-items: flex-start;
+    flex-shrink: 1;
+  }
+   
+  .adminstudents-test-account2 {
+    top: 0px;
+    left: 942px;
+    width: 66px;
+    height: 69px;
+    position: absolute;
+  }
+   
+  .adminstudents-icons8performancemacbook502 {
+    top: 15px;
+    left: 0px;
+    width: 58px;
+    height: 55px;
+    position: absolute;
+  }
+   
+  .adminstudents-text19 {
+    top: 15px;
+    left: 73px;
+    color: rgba(133, 75, 171, 1);
+    width: 338px;
+    height: auto;
+    position: absolute;
+    font-size: 32px;
+    font-style: SemiBold;
+    text-align: center;
+    font-family: Montserrat;
+    font-weight: 600;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+  }
+   
+  .adminstudents-group67 {
+    top: 204px;
+    left: 367px;
+    width: 980px;
+    height: 113px;
+    display: flex;
+    z-index: 5;
+    position: absolute;
+    align-items: flex-start;
+    flex-shrink: 1;
+  }
+   
+  .adminstudents-rectangle5 {
+    top: 0px;
+    left: 0px;
+    width: 980px;
+    height: 113px;
+    position: absolute;
+  }
+   
+  .adminstudents-frame7 {
+    top: 30px;
+    left: 29px;
+    width: 930px;
+    height: 52.57009506225586px;
+    display: flex;
+    position: absolute;
+    align-items: flex-start;
+    flex-shrink: 1;
+  }
+   
+  .adminstudents-rectangle13 {
+    left: 0px;
+    width: 783px;
+    bottom: -4px;
+    height: 53px;
+    position: absolute;
+    border-radius: 20px;
+  }
+   
+  .adminstudents-text20 {
+    left: -18px;
+    color: rgba(68, 38, 88, 1);
+    width: 445px;
+    bottom: 12px;
+    height: auto;
+    z-index: 2;
+    position: absolute;
+    font-size: 24px;
+    font-style: Light;
+    text-align: center;
+    font-family: Montserrat;
+    font-weight: 300;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+  }
+   
+  .adminstudents-button6 {
+    top: -1px;
+    right: -8px;
+    width: 138px;
+    height: 50px;
+    display: flex;
+    z-index: 1;
+    position: absolute;
+    align-items: flex-start;
+    flex-shrink: 1;
+    border-radius: 50px;
+    background-color: var(--dl-color-default-violet4);
+  }
+   
+  .adminstudents-text21 {
+    top: 12px;
+    left: 27px;
+    color: rgba(255, 255, 255, 1);
+    height: auto;
+    position: absolute;
+    font-size: 24px;
+    font-style: SemiBold;
+    text-align: center;
+    font-family: Montserrat;
+    font-weight: 600;
+    line-height: normal;
+    font-stretch: normal;
+    text-decoration: none;
+  }
+   
+  .adminstudents-icons8search5021 {
+    top: 30px;
+    left: 756px;
+    width: 50px;
+    height: 52px;
+    position: absolute;
+  }
+  .adminstudents-table {
+    width: 100%; 
+    margin-top: 60px; 
+    border-collapse: collapse;
+}
+
+.adminstudents-table th, .adminstudents-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.adminstudents-table th {
+    background-color:rgba(133, 75, 171, 1);
+    font-weight: bold;
+    color: #fff;
+    font-family: 'poppins', sans-serif;
+}
+.adminstudents-table td {
+    background-color: #fff;
+    color: rgba(68, 38, 88, 1);
+    font-family: 'poppins', sans-serif;
+}
+.adminstudents-table-profile {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
