@@ -1,16 +1,164 @@
-<form method="post">
-  {% csrf_token %}
-  <label for="username">Username:</label>
-  <input type="text" name="username" required>
+{% load static %}
+<!DOCTYPE html>
+<html lang="english"
+  ><head
+    ><title>Login admin</title
+    ><meta property="og:title" content="loginadmin - exported project" /><meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    /><meta charset="utf-8" /><meta
+      property="twitter:card"
+      content="summary_large_image"
+    />
+
+    <style data-tag="reset-style-sheet">
+      html {  line-height: 1.15;}body {  margin: 0;}* {  box-sizing: border-box;  border-width: 0;  border-style: solid;  -webkit-font-smoothing: antialiased;}p,li,ul,pre,div,h1,h2,h3,h4,h5,h6,figure,blockquote,figcaption {  margin: 0;  padding: 0;}button {  background-color: transparent;}button,input,optgroup,select,textarea {  font-family: inherit;  font-size: 100%;  line-height: 1.15;  margin: 0;}button,select {  text-transform: none;}button,[type="button"],[type="reset"],[type="submit"] {  -webkit-appearance: button;  color: inherit;}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner {  border-style: none;  padding: 0;}button:-moz-focus,[type="button"]:-moz-focus,[type="reset"]:-moz-focus,[type="submit"]:-moz-focus {  outline: 1px dotted ButtonText;}a {  color: inherit;  text-decoration: inherit;}input {  padding: 2px 4px;}img {  display: block;}details {  display: block;  margin: 0;  padding: 0;}summary::-webkit-details-marker {  display: none;}[data-thq="accordion"] [data-thq="accordion-content"] {  max-height: 0;  overflow: hidden;  transition: max-height 0.3s ease-in-out;  padding: 0;}[data-thq="accordion"] details[data-thq="accordion-trigger"][open] + [data-thq="accordion-content"] {  max-height: 1000vh;}details[data-thq="accordion-trigger"][open] summary [data-thq="accordion-icon"] {  transform: rotate(180deg);}html { scroll-behavior: smooth  }
+    </style>
+    <style data-tag="default-style-sheet">
+      html {
+        font-family: Inter;
+        font-size: 16px;
+      }
+
+      body {
+        font-weight: 400;
+        font-style:normal;
+        text-decoration: none;
+        text-transform: none;
+        letter-spacing: normal;
+        line-height: 1.15;
+        color: var(--dl-color-theme-neutral-dark);
+        background: var(--dl-color-theme-neutral-light);
+
+        fill: var(--dl-color-theme-neutral-dark);
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/animate.css@4.1.1/animate.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Erica+One:wght@400&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@teleporthq/teleport-custom-scripts/dist/style.css"
+    />
+    <link rel="stylesheet" href="{% static 'style2.css' %}" />
+    <link href="{% static 'login_admin.css' %}" rel="stylesheet" />
+  </head>
   
-  <label for="password">Password:</label>
-  <input type="password" name="password" required>
-
-  <button type="submit">Login as Admin</button>
-
-  {% if messages %}
-    {% for message in messages %}
-      <p style="color: red;">{{ message }}</p>
-    {% endfor %}
-  {% endif %}
-</form>
+  <body>
+      <div class="loginadmin-container1">
+          <div class="loginadmin-frame2">
+              <a href="{% url 'login_selection' %}" class="loginadmin-navlink">
+                  <div class="loginadmin-button">
+                      <img alt="Rectangle" src="{% static 'public2/external/rectangle182822-bvp-200h.png' %}" class="loginadmin-rectangle18" />
+                      <img alt="Back" src="{% static 'public2/external/back2822-xgqc-200h.png' %}" class="loginadmin-back" />
+                      <span class="loginadmin-text1">Back</span>
+                  </div>
+              </a>
+              <div class="loginadmin-column1">
+                  <span class="loginadmin-text2">Log in</span>
+                  <span class="loginadmin-text3">
+                      Log in as an administrator to manage student records, attendance, quizzes, and exams.
+                  </span>
+                  <img alt="Admin Login" src="{% static 'public2/external/image1e12963-izva-500w.png' %}" class="loginadmin-image1e1" />
+              </div>
+          </div>
+  
+          <div class="loginadmin-frame1">
+              <img alt="Background" src="{% static 'public2/external/untitleddesign12823-ufxl-1000w.png' %}" class="loginadmin-untitleddesign1" />
+              <img alt="Ellipse" src="{% static 'public2/external/ellipse22823-e6u.svg' %}" class="loginadmin-ellipse2" />
+              
+              <div class="loginadmin-frame3">
+                  <form method="POST" action="{% url 'login_admin' %}" class="loginadmin-form">
+                      {% csrf_token %}
+                      
+                      <div class="loginadmin-email-input">
+                          <div class="loginadmin-mageemail">
+                              <div class="loginadmin-group">
+                                  <img alt="Email Icon" src="{% static 'public2/external/vector2833-4pni.svg' %}" class="loginadmin-vector1" />
+                                  <img alt="Email Icon" src="{% static 'public2/external/vector2833-nfup.svg' %}" class="loginadmin-vector2" />
+                              </div>
+                          </div>
+                          <input type="email" name="username" placeholder="Email" class="loginadmin-textinput1 input" required />
+                      </div>
+  
+                      <div class="loginadmin-container2">
+                          <img alt="Password Icon" src="{% static 'public2/external/carbonpassword2833-d32.svg' %}" class="loginadmin-carbonpassword" />
+                          <input type="password" name="password" placeholder="Password" class="loginadmin-textinput2 input" required />
+                      </div>
+  
+                      <button type="submit" class="loginadmin-buttons">
+                          <span class="loginadmin-text4 pbuttons">Sign in</span>
+                      </button>
+  
+                      {% if error %}
+                          <p style="color: red; margin-top: 10px;">{{ error }}</p>
+                      {% endif %}
+                      
+                  </form>
+              </div>
+          </div>
+      </div>
+  </body>
+  </html>
+  

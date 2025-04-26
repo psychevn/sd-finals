@@ -1,19 +1,60 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 # Custom user model to handle role (admin, student)
 
 
+class CustomUserManager(BaseUserManager):
+    """Define a model manager for User model with no username field."""
+
+    def _create_user(self, email, password, **extra_fields):
+        """Create and save a User with the given email and password."""
+        if not email:
+            raise ValueError('The Email must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, email, password=None, **extra_fields):
+        """Create and save a regular User with the given email and password."""
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(email, password, **extra_fields)
+
+    def create_superuser(self, email, password, **extra_fields):
+        """Create and save a SuperUser with the given email and password."""
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_admin', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self._create_user(email, password, **extra_fields)
+
 class CustomUser(AbstractUser):
     is_student = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+    
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=150, blank=True, null=True)  # Make username optional
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name']  # Username not required for createsuperuser
+    
+    objects = CustomUserManager()  # Use the custom manager
 
 # Student profile fields
 class StudentProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     middle_name = models.CharField(max_length=50, blank=True)
     student_number = models.CharField(max_length=20, unique=True)
-    section = models.CharField(max_length=10)
+    section = models.CharField(max_length=10, default="A1")
+    course = models.CharField(max_length=30)
     phone = models.CharField(max_length=20, blank=True)
     birthday = models.DateField()
 

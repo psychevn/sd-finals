@@ -1,0 +1,240 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="english"
+  ><head
+    ><title>Admin dashboard</title
+    ><meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    /><meta charset="utf-8" /><meta
+      property="twitter:card"
+      content="summary_large_image"
+    />
+
+    <style data-tag="reset-style-sheet">
+      html {  line-height: 1.15;}body {  margin: 0;}* {  box-sizing: border-box;  border-width: 0;  border-style: solid;  -webkit-font-smoothing: antialiased;}p,li,ul,pre,div,h1,h2,h3,h4,h5,h6,figure,blockquote,figcaption {  margin: 0;  padding: 0;}button {  background-color: transparent;}button,input,optgroup,select,textarea {  font-family: inherit;  font-size: 100%;  line-height: 1.15;  margin: 0;}button,select {  text-transform: none;}button,[type="button"],[type="reset"],[type="submit"] {  -webkit-appearance: button;  color: inherit;}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner {  border-style: none;  padding: 0;}button:-moz-focus,[type="button"]:-moz-focus,[type="reset"]:-moz-focus,[type="submit"]:-moz-focus {  outline: 1px dotted ButtonText;}a {  color: inherit;  text-decoration: inherit;}input {  padding: 2px 4px;}img {  display: block;}details {  display: block;  margin: 0;  padding: 0;}summary::-webkit-details-marker {  display: none;}[data-thq="accordion"] [data-thq="accordion-content"] {  max-height: 0;  overflow: hidden;  transition: max-height 0.3s ease-in-out;  padding: 0;}[data-thq="accordion"] details[data-thq="accordion-trigger"][open] + [data-thq="accordion-content"] {  max-height: 1000vh;}details[data-thq="accordion-trigger"][open] summary [data-thq="accordion-icon"] {  transform: rotate(180deg);}html { scroll-behavior: smooth  }
+    </style>
+    <style data-tag="default-style-sheet">
+      html {
+        font-family: Inter;
+        font-size: 16px;
+      }
+
+      body {
+        font-weight: 400;
+        font-style:normal;
+        text-decoration: none;
+        text-transform: none;
+        letter-spacing: normal;
+        line-height: 1.15;
+        color: var(--dl-color-theme-neutral-dark);
+        background: var(--dl-color-theme-neutral-light);
+
+        fill: var(--dl-color-theme-neutral-dark);
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/animate.css@4.1.1/animate.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Erica+One:wght@400&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@teleporthq/teleport-custom-scripts/dist/style.css"
+    />
+  </head>
+  <body
+    ><link rel="stylesheet" href="{% static 'style2.css' %}" /><div
+      ><link href="{% static 'admin_dashboard.css' %}" rel="stylesheet" /><div
+        class="admindashboard-container1"
+        ><div class="admindashboard-admin-dashboard"
+          ><nav class="admindashboard-navigation"
+            ><div class="admindashboard-frame67"
+              ><div class="admindashboard-frame66button"
+                ><img
+                  alt="logc13053"
+                  src="{% static 'public2/external/logc13053-8v6k-200h.png' %}"
+                  class="admindashboard-logc1" /></div
+              ><a href="{% url 'admin_dashboard'%}" class="admindashboard-navlink1"
+                ><div class="admindashboard-button1"
+                  ><img
+                    alt="DashboardLayout1081"
+                    src="{% static 'public2/external/dashboardlayout1081-4ygd-200w.png' %}"
+                    class="admindashboard-dashboard-layout1"
+                  /><span class="admindashboard-text10">Dashboard</span></div
+                ></a
+              ><a href="{% url 'admin_students' %}" class="admindashboard-navlink2"
+                ><div class="admindashboard-button2"
+                  ><img
+                    alt="StudentMale1081"
+                    src="{% static 'public2/external/studentmale1081-vv6-200h.png' %}"
+                    class="admindashboard-student-male1"
+                  /><span class="admindashboard-text11">Students</span></div
+                ></a
+              ><a href="{% url 'admin_attendance' %} " class="admindashboard-navlink3"
+                ><div class="admindashboard-button3"
+                  ><img
+                    alt="Attendance1081"
+                    src="{% static 'public2/external/attendance1081-e3n-200h.png' %}"
+                    class="admindashboard-attendance"
+                  /><span class="admindashboard-text12">Attendance</span></div
+                ></a
+              ><a href="{% url 'admin_quiz' %}" class="admindashboard-navlink4"
+                ><div class="admindashboard-button4"
+                  ><img
+                    alt="Quiz1081"
+                    src="{% static 'public2/external/quiz1081-jkc9-200h.png' %}"
+                    class="admindashboard-quiz"
+                  /><span class="admindashboard-text13">Quiz</span></div
+                ></a
+              ><a href="{% url 'admin_exam' %}" class="admindashboard-navlink5"
+                ><div class="admindashboard-button5"
+                  ><span class="admindashboard-text14">Exam</span
+                  ><img
+                    alt="Exam1081"
+                    src="{% static 'public2/external/exam1081-9ji-200w.png'%}"
+                    class="admindashboard-exam" /></div></a></div></nav
+          ><div class="admindashboard-frame38"
+            ><header class="admindashboard-frame39"
+              ><div class="admindashboard-frame11"
+                ><span class="admindashboard-text15">Admin Dashboard</span
+                ><img
+                  alt="DashboardLayout1081"
+                  src="{% static 'public2/external/dashboardlayout1081-t1b-200h.png' %}"
+                  class="admindashboard-dashboard-layout2" />
+                  
+                <div class="profile-wrapper" onclick="toggleProfileDropdown()">
+                    <img alt="TestAccount1291" src="{% static 'public2/external/testaccount1291-dr5-200w.png' %}" class="adminstudents-test-account2" />
+                </div>
+            
+                <div id="profile-dropdown" class="profile-dropdown" style="display: none;">
+                    <a href="{% url 'logout' %}" class="dropdown-item">Logout</a>
+                    <!-- add more options if you want -->
+                </div>
+            </header></header
+            ><span class="admindashboard-text16">Welcome Admin!</span
+            ><span class="admindashboard-text17">Overview</span
+            ><div class="admindashboard-frame68"
+              ><div class="admindashboard-frame12"
+                ><img
+                  alt="Rectangle41081"
+                  src="{% static 'public2/external/rectangle41081-tdec.svg' %}"
+                  class="admindashboard-rectangle41"
+                /><div class="admindashboard-frame66"
+                  ><div class="admindashboard-container2"
+                    ><img
+                      alt="Ellipse21081"
+                      src="{% static 'public2/external/ellipse21081-htp-200h.png' %}"
+                      class="admindashboard-ellipse21" /><img
+                      alt="StudentMale1081"
+                      src="{% static 'public2/external/studentmale1081-op5-200h.png' %}"
+                      class="admindashboard-student-male2" /></div></div
+                ><span class="admindashboard-text18">Enrolled Students</span
+                ><span class="admindashboard-text19">999</span></div
+              ><div class="admindashboard-frame2"
+                ><img
+                  alt="Rectangle41081"
+                  src="{% static 'public2/external/rectangle41081-drlg.svg' %}"
+                  class="admindashboard-rectangle42"
+                /><span class="admindashboard-text20">999</span
+                ><div class="admindashboard-frame69"
+                  ><img
+                    alt="Ellipse21081"
+                    src="{% static 'public2/external/ellipse21081-lio-200h.png' %}"
+                    class="admindashboard-ellipse22" /><img
+                    alt="StudentMale1081"
+                    src="{% static 'public2/external/studentmale1081-qum9-200h.png' %}"
+                    class="admindashboard-student-male3" /></div
+                ><span class="admindashboard-text21"
+                  >Student’s Attended</span
+                ></div
+              ><div class="admindashboard-frame3"
+                ><img
+                  alt="Rectangle41081"
+                  src="{% static 'public2/external/rectangle41081-yorv.svg' %}"
+                  class="admindashboard-rectangle43" /><span
+                  class="admindashboard-text22"
+                  >999</span
+                ><span class="admindashboard-text23"
+                  >Pending Students’ Task</span
+                ><div class="admindashboard-frame70"
+                  ><img
+                    alt="Ellipse21081"
+                    src="{% static 'public2/external/ellipse21081-yswu-200h.png'%}"
+                    class="admindashboard-ellipse23" /><img
+                    alt="StudentMale1082"
+                    src="{% static 'public2/external/studentmale1082-hk2d-200h.png' %}"
+                    class="admindashboard-student-male4" /></div></div></div
+            ><span class="admindashboard-text24">Calendar</span
+            ><iframe
+              src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=1&amp;ctz=Asia%2FManila&amp;showPrint=0&amp;src=ZW4ucGhpbGlwcGluZXMjaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&amp;color=%230B8043"
+              width="800"
+              height="400"
+              scrolling="no"
+              class="admindashboard-iframe"
+            ></iframe></div
+          ><img
+            alt="Ellipse11081"
+            src="{% static 'public2/external/ellipse11081-s2bs.svg' %}"
+            class="admindashboard-ellipse1" /></div></div
+    ></div> </body
+></html>

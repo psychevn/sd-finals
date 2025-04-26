@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.db.models import Count, Avg
 from django.forms import formset_factory
 from datetime import datetime
-
+from django.contrib.auth.hashers import make_password
 from .models import (
     CustomUser, StudentProfile, Subject, AttendanceRecord, 
     Assessment, Quiz, Exam, Question, Choice, QuizResult, ExamResult
@@ -19,7 +19,7 @@ from .forms import (
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from .models import CustomUser
+from .models import CustomUser, StudentProfile
 from .forms import CustomUserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
 
@@ -30,16 +30,29 @@ def login_selection(request):
 # Student login
 def login_student(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            if user.is_student:
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        
+        # Check if user exists first
+        try:
+            user_exists = CustomUser.objects.get(email=email)
+            print(f"User found: {user_exists.email}")
+            
+            # Now try authentication
+            user = authenticate(request, email=email, password=password)
+            
+            if user is None:
+                messages.error(request, "Password is incorrect.")
+            elif not user.is_student:
+                messages.error(request, "This account doesn't have student permissions.")
+            else:
                 login(request, user)
                 return redirect('student_dashboard')
-        else:
-            return render(request, 'login_student.html', {'form': form, 'error': 'Invalid credentials or role'})
-    else:
-        return render(request, 'login_student.html', {'form': AuthenticationForm()})
+                
+        except CustomUser.DoesNotExist:
+            messages.error(request, "No account found with this email.")
+    
+    return render(request, 'login_student.html')
 
 # Admin login
 def login_admin(request):
@@ -58,16 +71,44 @@ def login_admin(request):
 # Student registration
 def register_student(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.is_student = True
-            user.save()
-            return redirect('login_student')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'register_student.html', {'form': form})
+        # Get form data
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        middle_name = request.POST.get('middle_name')
+        student_number = request.POST.get('student_number')
+        section = request.POST.get('section')
+        course = request.POST.get('course')
+        birthday = request.POST.get('birthday')
 
+        # Basic validation
+        if CustomUser.objects.filter(email=email).exists():
+            messages.error(request, "Email is already registered.")
+        elif StudentProfile.objects.filter(student_number=student_number).exists():
+            messages.error(request, "Student number is already in use.")
+        else:
+            username = request.POST.get('username')
+
+            user = CustomUser.objects.create_user(
+                email=email,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                is_student=True,
+                password=password,
+            )
+            StudentProfile.objects.create(
+                user=user,
+                middle_name=middle_name,
+                student_number=student_number,
+                section=section,
+                course=course,
+                birthday=birthday,
+            )
+            messages.success(request, "Registration successful!")
+
+    return render(request, 'register_student.html')
 # Logout
 def logout_view(request):
     logout(request)
@@ -105,14 +146,14 @@ def admin_dashboard(request):
         'quiz_avg': quiz_stats['avg_score'] if quiz_stats['avg_score'] else 0,
         'exam_avg': exam_stats['avg_score'] if exam_stats['avg_score'] else 0,
     }
-    return render(request, 'admin/dashboard.html', context)
+    return render(request, 'panel/dashboard.html', context)
 
 # Student Management
 @login_required
 @user_passes_test(is_admin)
-def student_list(request):
+def admin_students(request):
     students = StudentProfile.objects.all().order_by('user__last_name')
-    return render(request, 'admin/students/list.html', {'students': students})
+    return render(request, 'panel/students.html', {'students': students})
 
 @login_required
 @user_passes_test(is_admin)
@@ -144,7 +185,35 @@ def student_edit(request, pk):
         form = StudentProfileForm(instance=student)
     
     return render(request, 'admin/students/edit.html', {'form': form, 'student': student})
+# Attendance Page (Admin)
+@login_required
+@user_passes_test(is_admin)
+def admin_attendance(request):
+    attendances = AttendanceRecord.objects.all().order_by('-date')
+    context = {
+        'attendances': attendances
+    }
+    return render(request, 'admin/attendance.html', context)
 
+# Quiz Page (Admin)
+@login_required
+@user_passes_test(is_admin)
+def admin_quiz(request):
+    quizzes = Quiz.objects.all().order_by('-created_at')
+    context = {
+        'quizzes': quizzes
+    }
+    return render(request, 'admin/quiz.html', context)
+
+# Exam Page (Admin)
+@login_required
+@user_passes_test(is_admin)
+def admin_exam(request):
+    exams = Exam.objects.all().order_by('-created_at')
+    context = {
+        'exams': exams
+    }
+    return render(request, 'admin/exam.html', context)
 # Attendance Management
 @login_required
 @user_passes_test(is_admin)
