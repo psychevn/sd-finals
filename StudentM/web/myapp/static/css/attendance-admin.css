@@ -1,0 +1,400 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.attendance-admin-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+  
+/* ===== NAVIGATION SIDEBAR ===== */
+.exam-admin-navigation {
+  width: auto;
+  height: 150vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: white;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  position: relative;
+}
+
+.nav-logo {
+  width: 100%;
+  height: 98px;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.nav-splash {
+  position: absolute;
+  top: 18px;
+  left: 26px;
+  width: 57px;
+  height: 61px;
+}
+
+/* Navigation Items */
+.nav-buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 20px;
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  padding: 0 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+div .logo-container {
+  background-color: #6d3a8f;
+  align-items: top;
+  top: 0;
+  width: 100%;
+  height: 60px;
+}
+.nav-button:hover {
+  background: rgba(133, 75, 171, 0.1);
+}
+
+.nav-button.active {
+  background: #854BAB;
+}
+
+.nav-button.active span {
+  color: white !important;
+}
+
+.nav-icon {
+  width: 35px;
+  height: 35px;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.nav-button span {
+  color: #854BAB;
+  font-size: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  padding-right: 0;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+}
+
+.header-title img {
+  width: 50px;
+  margin-right: 15px;
+}
+
+.header-title h1 {
+  color: #854bab;
+  font-size: 28px;
+}
+
+.user-profile img {
+  width: auto;
+  height: 50px;
+}
+
+.content-area {
+  padding: 30px;
+  flex: 1;
+}
+
+.stats-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  gap: 20px;
+}
+
+.stat-card {
+  flex: 1;
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  min-height: 180px;
+}
+
+.stat-card h3 {
+  color: #854bab;
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.stat-card p {
+  color: #8e8e8e;
+  font-size: 18px;
+}
+
+.stat-icon {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+}
+
+.stat-icon img {
+  width: 70px;
+  height: auto;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 200px;
+}
+
+.export-button, .print-button {
+  padding: 15px;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.export-button {
+  background-color: #854bab;
+  color: white;
+}
+
+.print-button {
+  background-color: white;
+  color: #854bab;
+  border: 1px solid #854bab;
+}
+
+.export-button:hover {
+  background-color: #6d3a8f;
+}
+
+.print-button:hover {
+  background-color: #f0f0f0;
+}
+
+.attendance-form {
+  background-color: rgba(180, 135, 239, 0.5);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 30px;
+  border: 1px solid #854bab;
+}
+
+.attendance-form h2 {
+  color: #442658;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #442658;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.form-group select, 
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 16px;
+  background-color: white;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #854bab;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #6d3a8f;
+}
+
+.filter-section {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  align-items: center;
+}
+
+.filter-group {
+  flex: 1;
+}
+
+.filter-group select, 
+.filter-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 16px;
+  background-color: rgba(180, 135, 239, 0.5);
+}
+
+.filter-button {
+  padding: 12px 20px;
+  background-color: #854bab;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.filter-button:hover {
+  background-color: #6d3a8f;
+}
+
+.attendance-table {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.table-header {
+  display: flex;
+  background-color: #854bab;
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.header-cell {
+  flex: 1;
+  padding: 15px;
+  text-align: center;
+}
+
+.table-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-row {
+  display: flex;
+  border-bottom: 1px solid #eee;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-cell {
+  flex: 1;
+  padding: 15px;
+  text-align: center;
+  color: #442658;
+}
+ /* Account Button Styles */
+ .user-profile {
+  position: relative;
+  margin-right: 20px;
+}
+
+.account-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.account-button img {
+  width: 50px;
+  height: 50px;
+  transition: transform 0.3s;
+}
+
+.account-button:hover img {
+  transform: scale(1.05);
+}
+
+.account-menu {
+  display: none;
+  position: absolute;
+  top: 60px;
+  right: 0;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  min-width: 180px;
+  overflow: hidden;
+}
+
+.account-menu a {
+  display: block;
+  padding: 12px 20px;
+  text-decoration: none;
+  color: #333;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.account-menu a:hover {
+  background-color: rgba(133, 75, 171, 0.1);
+  color: #854BAB;
+}
+
+/* Show menu when active */
+.account-menu.active {
+  display: block;
+}
