@@ -1,0 +1,56 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3>Exam Management</h3>
+                    <a href="{% url 'exam_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create New Exam
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Created By</th>
+                                    <th>Created At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for exam in exams %}
+                                <tr>
+                                    <td>{{ exam.title }}</td>
+                                    <td>{{ exam.created_by.get_full_name }}</td>
+                                    <td>{{ exam.created_at|date:"F j, Y, g:i a" }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'exam_edit' exam.id %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            <a href="{% url 'exam_responses' exam.id %}" class="btn btn-sm btn-success">
+                                                <i class="fas fa-list"></i> Responses
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No exams found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

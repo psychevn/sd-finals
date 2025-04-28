@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <title>Quiz Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/quiz-admin.css' %}">
+</head>
+<body>
+  <div class="quiz-admin-container">
+
+  <!-- Navigation Sidebar -->
+  <div class="exam-admin-navigation">
+    <div class="logo-container"></div>
+    <div class="nav-buttons-container">
+       <a href="{% url 'admin_dashboard' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+        <img src="{% static 'public3/external/dashboardlayout2136-pwh-200w.png' %}" alt="Dashboard" class="nav-icon">
+        <span>Dashboard</span>
+      </div></a>
+      
+       <a href="{% url 'admin_students' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+        <img src="{% static 'public3/external/studentmale2134-uejm-200h.png' %}" alt="Students" class="nav-icon">
+        <span>Students</span>
+      </div></a>
+      
+       <a href="{% url 'admin_attendance' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+        <img src="{% static 'public3/external/attendance7018-1v4-200h.png' %}" alt="Attendance" class="nav-icon">
+        <span>Attendance</span>
+      </div></a>
+      
+       <a href="{% url 'admin_quiz' %}" style="text-decoration: none;"><div class="nav-button active">
+        <img src="{% static 'public3/external/quiz2137-2g3-200h.png' %}" alt="Quiz" class="nav-icon">
+        <span>Quiz</span>
+      </div></a>
+      
+       <a href="{% url 'admin_exam' %}" style="text-decoration: none;"><div class="nav-button " style="border:  #854BAB 1px solid;">
+        <img src="{% static 'public3/external/exam2137-tdwn-200w.png' %}" alt="Exam" class="nav-icon">
+        <span>Exam</span>
+      </div></a>
+    </div>
+  </div> 
+    <div class="main-content">
+      <header class="header">
+        <div class="header-title">
+          <img src="{% static 'public3/external/quiz1343-lna-200h.png' %}" alt="Quiz Icon">
+          <h1>Quiz Page</h1>
+        </div>
+              <!-- Replace the existing user-profile div with this: -->
+      <div class="user-profile">
+        <button class="account-button" onclick="toggleAccountMenu()">
+          <img src="{% static 'public3/external/testaccount1812-au0p-200w.png' %}" alt="User">
+        </button>
+        
+        <!-- Account Dropdown Menu -->
+        <div id="accountMenu" class="account-menu">
+          <a href="{% url 'logout' %}">Logout</a>
+        </div>
+      </div>
+      </header>
+
+      <div class="content-area">
+        <button class="add-quiz-button" id="addQuizBtn">
+          <img src="{% static 'public3/external/plusmath2022-wtv-200w.png' %}" alt="Add">
+          <span>Add Quiz</span>
+        </button>
+
+        <div class="divider"></div>
+
+        <div class="quiz-list">
+          {% for quiz in quizzes %}
+          <div class="quiz-item">
+            <h3>{{ quiz.title }} - {{ quiz.subject.name }}</h3>
+            <div class="quiz-details">
+              <span>Questions: {{ quiz.total_questions }}</span>
+              <span>Points: {{ quiz.total_points }}</span>
+              <span>Due: {{ quiz.due_date|date:"F j, Y" }}</span>
+            </div>
+            <div class="quiz-actions">
+              <a href="{% url 'quiz_edit' quiz.id %}" class="edit-button">Edit</a>
+              <a href="{% url 'quiz_responses' quiz.id %}" class="responses-button">Responses</a>
+            </div>
+          </div>
+          {% empty %}
+          <div class="no-quizzes">
+            <p>No quizzes found. Create your first quiz!</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Quiz Modal -->
+  <div class="modal" id="quizModal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Create New Quiz</h2>
+      <form id="quizForm" method="POST" action="{% url 'quiz_question_bank' %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="quizTitle">Quiz Title:</label>
+          <input type="text" id="quizTitle" name="title" required>
+        </div>
+        <div class="form-group">
+          <label for="quizSubject">Subject:</label>
+          <select id="quizSubject" name="subject" required>
+            <option value="">Select Subject</option>
+            {% for subject in subjects %}
+              <option value="{{ subject.id }}">{{ subject.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="quizDate">Due Date:</label>
+          <input type="datetime-local" id="quizDate" name="due_date" required>
+        </div>
+        <div class="form-group">
+          <label for="timeLimit">Time Limit (minutes):</label>
+          <input type="number" id="timeLimit" name="time_limit" min="1" value="30" required>
+        </div>
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea id="description" name="description" rows="3"></textarea>
+        </div>
+        <button type="submit" class="submit-button">Create Quiz</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Navigation functionality
+    const navButtons = document.querySelectorAll('.nav-button');
+    navButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        navButtons.forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Add Quiz modal functionality
+    const modal = document.getElementById('quizModal');
+    const addQuizBtn = document.getElementById('addQuizBtn');
+    const closeBtn = document.querySelector('.close');
+    const quizForm = document.getElementById('quizForm');
+
+    addQuizBtn.addEventListener('click', function() {
+      modal.style.display = 'block';
+    });
+
+    closeBtn.addEventListener('click', function() {
+      modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', function(event) {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+
+    // Toggle account menu
+    function toggleAccountMenu() {
+      const menu = document.getElementById('accountMenu');
+      menu.classList.toggle('active');
+    }
+    
+    document.addEventListener('click', function(event) {
+      const accountMenu = document.getElementById('accountMenu');
+      const accountButton = document.querySelector('.account-button');
+      
+      if (!accountButton.contains(event.target) && !accountMenu.contains(event.target)) {
+        accountMenu.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

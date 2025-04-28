@@ -1,0 +1,147 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>{% if quiz %}Edit Quiz{% else %}Create New Quiz{% endif %}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="title">Quiz Title</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   value="{{ quiz.title }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <select class="form-control" id="subject" name="subject">
+                                <option value="">Select a subject</option>
+                                {% for subject in subjects %}
+                                <option value="{{ subject.id }}" {% if quiz.subject.id == subject.id %}selected{% endif %}>
+                                    {{ subject.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="due_date">Due Date</label>
+                            <input type="datetime-local" class="form-control" id="due_date" name="due_date" 
+                                   value="{{ quiz.due_date|date:'Y-m-d\TH:i' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ quiz.description }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="time_limit">Time Limit (minutes)</label>
+                            <input type="number" class="form-control" id="time_limit" name="time_limit" 
+                                   value="{{ quiz.time_limit }}" required>
+                        </div>
+                        
+                        <h4 class="mt-4">Questions</h4>
+                        <div id="questions-container">
+                            {% for question in quiz.questions.all %}
+                            <div class="question-item card mb-3">
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label>Question Content</label>
+                                        <textarea class="form-control" name="question_content[]" required>{{ question.content }}</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Question Type</label>
+                                        <select class="form-control" name="question_type[]" required>
+                                            <option value="multiple_choice" {% if question.question_type == 'multiple_choice' %}selected{% endif %}>Multiple Choice</option>
+                                            <option value="short_answer" {% if question.question_type == 'short_answer' %}selected{% endif %}>Short Answer</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Points</label>
+                                        <input type="number" class="form-control" name="question_points[]" 
+                                               value="{{ question.points }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Order</label>
+                                        <input type="number" class="form-control" name="question_order[]" 
+                                               value="{{ question.order }}" required>
+                                    </div>
+                                    
+                                    {% if question.question_type == 'multiple_choice' %}
+                                    <div class="choices-container mt-3">
+                                        <h5>Choices</h5>
+                                        {% for choice in question.choices.all %}
+                                        <div class="choice-item mb-2">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" name="choice_text[]" 
+                                                       value="{{ choice.text }}" required>
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text">
+                                                        <input type="checkbox" name="choice_correct[]" 
+                                                               value="{{ choice.id }}" {% if choice.is_correct %}checked{% endif %}>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <button type="button" class="btn btn-secondary" id="add-question">
+                            <i class="fas fa-plus"></i> Add Question
+                        </button>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                {% if quiz %}Update Quiz{% else %}Create Quiz{% endif %}
+                            </button>
+                            <a href="{% url 'admin_quiz' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.getElementById('add-question').addEventListener('click', function() {
+    const container = document.getElementById('questions-container');
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'question-item card mb-3';
+    questionDiv.innerHTML = `
+        <div class="card-body">
+            <div class="form-group">
+                <label>Question Content</label>
+                <textarea class="form-control" name="question_content[]" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Question Type</label>
+                <select class="form-control" name="question_type[]" required>
+                    <option value="multiple_choice">Multiple Choice</option>
+                    <option value="short_answer">Short Answer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Points</label>
+                <input type="number" class="form-control" name="question_points[]" required>
+            </div>
+            <div class="form-group">
+                <label>Order</label>
+                <input type="number" class="form-control" name="question_order[]" required>
+            </div>
+        </div>
+    `;
+    container.appendChild(questionDiv);
+});
+</script>
+{% endblock %}
+{% endblock %} 

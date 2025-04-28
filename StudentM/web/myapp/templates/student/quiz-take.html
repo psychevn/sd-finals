@@ -1,0 +1,219 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Quiz Student View</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+  <link rel="stylesheet" href="{% static 'css/student-quiz-take.css' %}">
+</head>
+<body>
+  <div class="exam-responses-admin-container">
+    <!-- Navigation Sidebar -->
+    <div class="exam-admin-navigation">
+      <div class="logo-container"></div>
+      <div class="nav-buttons-container">
+        <a href="{% url 'dashboard' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/dashboardlayout2136-pwh-200w.png' %}" alt="Dashboard" class="nav-icon">
+          <span>Dashboard</span>
+        </div></a>
+        <a href="{% url 'profile' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/studentmale2134-uejm-200h.png' %}" alt="Students" class="nav-icon">
+          <span>Students</span>
+        </div></a>
+        <a href="{% url 'attendance' %}" style="text-decoration: none;"></a><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/attendance7018-1v4-200h.png' %}" alt="Attendance" class="nav-icon">
+          <span>Attendance</span>
+        </div></a>
+        <a href="{% url 'quiz' %}" style="text-decoration: none;"></a><div class="nav-button active">
+          <img src="{% static 'public3/external/quiz2137-2g3-200h.png' %}" alt="Quiz" class="nav-icon">
+          <span>Quiz</span>
+        </div></a>
+        <a href="{% url 'exam' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/exam2137-tdwn-200w.png' %}" alt="Exam" class="nav-icon">
+          <span>Exam</span>
+        </div></a>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header -->
+      <div class="page-header">
+        <img src="{% static 'public3/external/quiz2137-3uc7-200h.png' %}" alt="Quiz" class="header-icon">
+        <h1>Quiz 2 - Software Design</h1>
+      </div>
+      
+      <div class="divider"></div>
+      
+      <!-- Exam Info -->
+      <div class="exam-info-card">
+        <h2>Quiz 2 - Software Design</h2>
+        <div class="exam-meta">
+          <span>Total Questions: 10</span>
+          <span>Time Limit: 30mins</span>
+          <span>Due Date: May 15, 2023</span>
+        </div>
+        <p class="exam-instructions">Read each question carefully and select the best answer</p>
+      </div>
+      
+      <!-- Question Container -->
+      <div class="question-container" id="questionContainer">
+        <!-- Questions will be loaded here by JavaScript -->
+      </div>
+      
+      <!-- Navigation Buttons -->
+      <div class="question-nav-buttons">
+        <button class="btn btn-outline" id="prevBtn">Previous Question</button>
+        <button class="btn btn-primary" id="nextBtn">Next Question</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample quiz data
+    const quizData = {
+      quizTitle: "Quiz 2 - Software Design",
+      totalQuestions: 10,
+      timeLimit: "30mins",
+      dueDate: "May 15, 2023",
+      questions: [
+        {
+          number: 1,
+          text: "Which of the following is NOT a principle of object-oriented programming?",
+          options: [
+            { text: "Encapsulation", selected: false },
+            { text: "Inheritance", selected: false },
+            { text: "Polymorphism", selected: false },
+            { text: "Serialization", selected: false }
+          ],
+          type: "multiple_choice"
+        },
+        {
+          number: 2,
+          text: "Explain the difference between aggregation and composition in object-oriented design.",
+          answer: "",
+          type: "short_answer"
+        }
+        // Add more questions as needed
+      ]
+    };
+
+    // Current question index
+    let currentQuestionIndex = 0;
+
+    // DOM Elements
+    const questionContainer = document.getElementById('questionContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    // Load question
+    function loadQuestion(index) {
+      const question = quizData.questions[index];
+      let questionHtml = '';
+
+      if (question.type === "multiple_choice") {
+        // Multiple choice question
+        questionHtml = `
+          <div class="question-card">
+            <h3>Question ${question.number} of ${quizData.totalQuestions}</h3>
+            <p class="question-text">${question.text}</p>
+            <div class="options-container">
+              ${question.options.map((option, i) => `
+                <div class="option ${option.selected ? 'selected' : ''}" data-index="${i}">
+                  <div class="option-indicator"></div>
+                  <span>${option.text}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        // Short answer question
+        questionHtml = `
+          <div class="question-card">
+            <h3>Question ${question.number} of ${quizData.totalQuestions}</h3>
+            <p class="question-text">${question.text}</p>
+            <div class="answer-container">
+              <textarea class="short-answer-input" placeholder="Type your answer here...">${question.answer || ''}</textarea>
+            </div>
+          </div>
+        `;
+      }
+
+      questionContainer.innerHTML = questionHtml;
+      
+      // Add event listeners for options
+      if (question.type === "multiple_choice") {
+        document.querySelectorAll('.option').forEach(option => {
+          option.addEventListener('click', function() {
+            const optionIndex = parseInt(this.getAttribute('data-index'));
+            // Deselect all options
+            document.querySelectorAll('.option').forEach(opt => {
+              opt.classList.remove('selected');
+              quizData.questions[index].options[parseInt(opt.getAttribute('data-index'))].selected = false;
+            });
+            // Select clicked option
+            this.classList.add('selected');
+            quizData.questions[index].options[optionIndex].selected = true;
+          });
+        });
+      }
+      
+      // Update button states and text
+      prevBtn.disabled = index === 0;
+      if (index === quizData.questions.length - 1) {
+        nextBtn.textContent = 'Submit Quiz';
+      } else {
+        nextBtn.textContent = 'Next Question';
+      }
+    }
+
+    // Save short answer when leaving the question
+    function saveShortAnswer(index) {
+      if (quizData.questions[index].type === "short_answer") {
+        const answerInput = document.querySelector('.short-answer-input');
+        if (answerInput) {
+          quizData.questions[index].answer = answerInput.value;
+        }
+      }
+    }
+
+    // Event listeners
+    prevBtn.addEventListener('click', () => {
+      saveShortAnswer(currentQuestionIndex);
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        loadQuestion(currentQuestionIndex);
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      saveShortAnswer(currentQuestionIndex);
+      if (currentQuestionIndex < quizData.questions.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion(currentQuestionIndex);
+      } else {
+        // Submit the quiz
+        console.log('Submitting quiz:', quizData);
+        alert('Quiz submitted successfully!');
+        // Here you would typically send the data to the server
+      }
+    });
+
+    // Navigation buttons
+    document.querySelectorAll('.nav-button').forEach(button => {
+      button.addEventListener('click', function() {
+        document.querySelectorAll('.nav-button').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        this.classList.add('active');
+      });
+    });
+
+    // Load first question
+    loadQuestion(0);
+  </script>
+</body>
+</html>

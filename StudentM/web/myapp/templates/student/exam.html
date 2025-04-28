@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Exam Student View</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap">
+  <link rel="stylesheet" href="{% static 'css/exam-stdnt-view.css' %}">
+</head>
+<body>
+  
+  <div class="quiz-admin-container">
+    <!-- Navigation Sidebar -->
+    <div class="exam-admin-navigation">
+      <div class="logo-container"></div>
+      <div class="nav-buttons-container">
+        <a href="{% url 'dashboard' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/dashboardlayout2136-pwh-200w.png' %}" alt="Dashboard" class="nav-icon">
+          <span>Dashboard</span>
+        </div></a>
+        
+        <a href="{% url 'students' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/studentmale2134-uejm-200h.png' %}" alt="Students" class="nav-icon">
+          <span>Students</span>
+        </div></a>
+        
+        <a href="{% url 'attendance' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/attendance7018-1v4-200h.png' %}" alt="Attendance" class="nav-icon">
+          <span>Attendance</span>
+        </div></a>
+        
+        <a href="{% url 'quiz' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/quiz2134-ijk5-200h.png' %}" alt="Quiz" class="nav-icon">
+          <span>Quiz</span>
+        </div></a>
+        
+        <a href="{% url 'exam' %}" style="text-decoration: none;"><div class="nav-button active">
+          <img src="{% static 'public3/external/exam2134-f15t-200w.png' %}" alt="Exam" class="nav-icon">
+          <span>Exam</span>
+        </div></a>
+      </div>
+    </div>
+  <div class="main-content">
+    <div class="header">
+      <div class="page-title">
+        <img src="{% static 'public3/external/exam1812-wfmb-200h.png' %}" alt="Exam">
+        <h1>Exam Page</h1>
+      </div>
+      <!-- Replace the existing user-profile div with this: -->
+      <div class="user-profile">
+        <button class="account-button" onclick="toggleAccountMenu()">
+          <img src="{% static 'public3/external/testaccount1812-au0p-200w.png' %}" alt="User">
+        </button>
+        
+        <!-- Account Dropdown Menu -->
+        <div id="accountMenu" class="account-menu">
+          <a href="{% url 'logout' %}">Logout</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="exam-section">
+      
+      <div class="exam-list">
+        <div class="exam-card">
+          <div class="exam-info">
+            <div class="exam-name">Prelim Exam- Programming</div>
+          </div>
+          <div class="exam-status status-recorded">Recorded</div>
+          <div class="exam-action">
+            <button class="action-button">Result</button>
+          </div>
+        </div>
+        <div class="exam-card">
+          <div class="exam-info">
+            <div class="exam-name">Final Exam - Programming</div>
+          </div>
+          <div class="exam-status status-pending">Pending</div>
+          <div class="exam-action">
+            <button class="action-button">Take</button>
+          </div>
+        </div>
+        <div class="exam-card">
+          <div class="exam-info">
+            <div class="exam-name">MidTerm Exam - Programming</div>
+          </div>
+          <div class="exam-status status-pending">Pending</div>
+          <div class="exam-action">
+            <button class="action-button">Take</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script>
+    // Add navigation functionality
+    document.querySelectorAll('.nav-button').forEach(button => {
+      button.addEventListener('click', function() {
+        // Remove active class from all buttons
+        document.querySelectorAll('.nav-button').forEach(btn => {
+          btn.classList.remove('active');
+          btn.querySelector('span').style.color = 'rgba(133, 75, 171, 1)';
+        });
+        
+        // Add active class to clicked button
+        this.classList.add('active');
+        this.querySelector('span').style.color = 'white';
+        
+        // Here you would typically navigate to the selected page
+        // For now, we'll just log the selection
+        console.log('Navigating to:', this.querySelector('span').textContent);
+      });
+    });
+
+    // Add button functionality
+    document.querySelectorAll('.action-button').forEach(button => {
+      button.addEventListener('click', function() {
+        const action = this.textContent;
+        const examName = this.closest('.exam-card').querySelector('.exam-name').textContent;
+        
+        if (action === 'Take') {                                                    
+          alert(`Starting exam: ${examName}`);
+          // Here you would typically redirect to the exam page
+        } else if (action === 'Result') {
+          alert(`Showing results for: ${examName}`);
+          // Here you would typically redirect to the results page
+        }
+      });
+    });
+  </script>
+        <script>
+          // Toggle account menu
+      function toggleAccountMenu() {
+        const menu = document.getElementById('accountMenu');
+        menu.classList.toggle('active');
+      }
+      
+      // Close account menu when clicking outside
+      document.addEventListener('click', function(event) {
+        const accountMenu = document.getElementById('accountMenu');
+        const accountButton = document.querySelector('.account-button');
+        
+        if (!accountButton.contains(event.target) && !accountMenu.contains(event.target)) {
+          accountMenu.classList.remove('active');
+        }
+      });
+        </script>
+</body>
+</html>

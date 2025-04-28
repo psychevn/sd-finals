@@ -1,0 +1,75 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Grade Exam - {{ exam.title }}</h3>
+                    <p class="mb-0">Student: {{ result.student.user.get_full_name }}</p>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for answer in answers %}
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5>Question {{ forloop.counter }}</h5>
+                                <p class="mb-0">Points: {{ answer.question.points }}</p>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <h6>Question:</h6>
+                                    <p>{{ answer.question.text }}</p>
+                                </div>
+                                
+                                {% if answer.question.question_type == 'multiple_choice' %}
+                                <div class="mb-3">
+                                    <h6>Student's Answer:</h6>
+                                    <p>{{ answer.selected_choice.text }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <h6>Correct Answer:</h6>
+                                    <p>{{ answer.question.choices.get.is_correct.text }}</p>
+                                </div>
+                                <div class="form-group">
+                                    <label>Points Earned:</label>
+                                    <input type="number" class="form-control" name="points_{{ answer.id }}" 
+                                           value="{% if answer.is_correct %}{{ answer.question.points }}{% else %}0{% endif %}"
+                                           min="0" max="{{ answer.question.points }}" required>
+                                </div>
+                                {% else %}
+                                <div class="mb-3">
+                                    <h6>Student's Answer:</h6>
+                                    <p>{{ answer.answer_text }}</p>
+                                </div>
+                                <div class="form-group">
+                                    <label>Points Earned:</label>
+                                    <input type="number" class="form-control" name="points_{{ answer.id }}" 
+                                           value="{{ answer.points_earned|default:0 }}"
+                                           min="0" max="{{ answer.question.points }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Feedback:</label>
+                                    <textarea class="form-control" name="feedback_{{ answer.id }}" rows="3">{{ answer.feedback }}</textarea>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Grade
+                            </button>
+                            <a href="{% url 'exam_responses' exam.id %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
