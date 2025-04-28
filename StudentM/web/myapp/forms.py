@@ -51,7 +51,11 @@ class BulkAttendanceForm(forms.Form):
 class QuizForm(forms.ModelForm):
     class Meta:
         model = Quiz
-        fields = ['title']
+        fields = ['title', 'description', 'subject', 'due_date', 'time_limit', 'total_points']
+        widgets = {
+            'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }
 
 class ExamForm(forms.ModelForm):
     class Meta:

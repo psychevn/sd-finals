@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.utils import timezone
 
 # Custom user model to handle role (admin, student)
 
@@ -74,6 +75,7 @@ class AttendanceRecord(models.Model):
     STATUS_CHOICES = (
         ('Present', 'Present'),
         ('Absent', 'Absent'),
+        ('Late', 'Late'),
     )
 
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
@@ -104,35 +106,107 @@ class Assessment(models.Model):
 
 class Quiz(models.Model):
     title = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)
     created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    due_date = models.DateTimeField(default=timezone.now)
+    time_limit = models.IntegerField(help_text="Time limit in minutes", default=30)
+    total_questions = models.IntegerField(default=0)
+    total_points = models.IntegerField(default=0)
+    is_published = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
-class Exam(models.Model):
-    title = models.CharField(max_length=100)
-    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.title} - {self.subject.name}"
+
+    def save(self, *args, **kwargs):
+        # First save the quiz to get a primary key
+        super().save(*args, **kwargs)
+        
+        # Then calculate total points if the quiz exists in the database
+        if self.pk:
+            self.total_points = sum(question.points for question in self.questions.all())
+            super().save(*args, **kwargs)
 
 class Question(models.Model):
-    QUESTION_TYPE = (
-        ('quiz', 'Quiz'),
-        ('exam', 'Exam'),
+    QUESTION_TYPES = (
+        ('multiple_choice', 'Multiple Choice'),
+        ('short_answer', 'Short Answer'),
     )
+    
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions', null=True, blank=True)
+    question_type = models.CharField(max_length=20, choices=QUESTION_TYPES)
     content = models.TextField()
-    question_type = models.CharField(max_length=10, choices=QUESTION_TYPE)
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, null=True, blank=True)
-    exam = models.ForeignKey(Exam, on_delete=models.CASCADE, null=True, blank=True)
+    points = models.IntegerField(default=1)
+    order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Question {self.order} - {self.quiz.title}"
+
+    class Meta:
+        ordering = ['order']
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='choices')
-    text = models.CharField(max_length=255)
+    text = models.CharField(max_length=255, default='')
     is_correct = models.BooleanField(default=False)
+    order = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.text} - {'Correct' if self.is_correct else 'Incorrect'}"
+
+    class Meta:
+        ordering = ['order']
 
 class QuizResult(models.Model):
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     date_taken = models.DateTimeField(auto_now_add=True)
-    score = models.FloatField()
+    date_submitted = models.DateTimeField(null=True, blank=True)
+    score = models.FloatField(default=0)
+    total_points = models.FloatField(null=True, blank=True)
+    time_taken = models.IntegerField(help_text="Time taken in seconds", default=0)
+    is_completed = models.BooleanField(default=False)
+    is_graded = models.BooleanField(default=False)
     remarks = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.student.user.get_full_name()} - {self.quiz.title} - {self.score}/{self.total_points}"
+
+    def save(self, *args, **kwargs):
+        if not self.total_points:
+            self.total_points = self.quiz.total_points
+        super().save(*args, **kwargs)
+
+class StudentAnswer(models.Model):
+    quiz_result = models.ForeignKey(QuizResult, on_delete=models.CASCADE, related_name='answers')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    answer_text = models.TextField(blank=True, null=True)
+    selected_choice = models.ForeignKey(Choice, on_delete=models.CASCADE, null=True, blank=True)
+    is_correct = models.BooleanField(default=False)
+    points_earned = models.FloatField(default=0)
+    feedback = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Answer for {self.question.content[:50]}..."
+
+    def save(self, *args, **kwargs):
+        if self.question.question_type == 'multiple_choice':
+            self.is_correct = self.selected_choice.is_correct if self.selected_choice else False
+            self.points_earned = self.question.points if self.is_correct else 0
+        super().save(*args, **kwargs)
+        # Update quiz result score
+        self.quiz_result.score = sum(answer.points_earned for answer in self.quiz_result.answers.all())
+        self.quiz_result.save()
+
+class Exam(models.Model):
+    title = models.CharField(max_length=100)
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class ExamResult(models.Model):
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)

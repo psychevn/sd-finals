@@ -22,6 +22,8 @@ from django.contrib.auth import authenticate, login, logout
 from .models import CustomUser, StudentProfile
 from .forms import CustomUserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
+import json
+from django.utils import timezone
 
 # Login selection
 def login_selection(request):
@@ -189,21 +191,59 @@ def student_edit(request, pk):
 @login_required
 @user_passes_test(is_admin)
 def admin_attendance(request):
+    if request.method == 'POST':
+        form = AttendanceRecordForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Attendance record added successfully.')
+            return redirect('admin_attendance')
+    else:
+        form = AttendanceRecordForm(initial={'date': datetime.now().date()})
+
+    # Get filter parameters
+    subject_filter = request.GET.get('subject')
+    date_filter = request.GET.get('date')
+    status_filter = request.GET.get('status')
+
+    # Base queryset
     attendances = AttendanceRecord.objects.all().order_by('-date')
+
+    # Apply filters
+    if subject_filter:
+        attendances = attendances.filter(subject_id=subject_filter)
+    if date_filter:
+        attendances = attendances.filter(date=date_filter)
+    if status_filter:
+        attendances = attendances.filter(status=status_filter)
+
+    # Calculate statistics
+    present_count = attendances.filter(status='Present').count()
+    absent_count = attendances.filter(status='Absent').count()
+    late_count = attendances.filter(status='Late').count()
+
     context = {
-        'attendances': attendances
+        'attendances': attendances,
+        'form': form,
+        'subjects': Subject.objects.all(),
+        'selected_subject': subject_filter,
+        'selected_date': date_filter,
+        'selected_status': status_filter,
+        'present_count': present_count,
+        'absent_count': absent_count,
+        'late_count': late_count,
     }
-    return render(request, 'admin/attendance.html', context)
+    return render(request, 'panel/attendance.html', context)
 
 # Quiz Page (Admin)
 @login_required
 @user_passes_test(is_admin)
 def admin_quiz(request):
     quizzes = Quiz.objects.all().order_by('-created_at')
-    context = {
-        'quizzes': quizzes
-    }
-    return render(request, 'admin/quiz.html', context)
+    subjects = Subject.objects.all()
+    return render(request, 'panel/quiz.html', {
+        'quizzes': quizzes,
+        'subjects': subjects
+    })
 
 # Exam Page (Admin)
 @login_required
@@ -213,14 +253,14 @@ def admin_exam(request):
     context = {
         'exams': exams
     }
-    return render(request, 'admin/exam.html', context)
+    return render(request, 'panel/exam.html', context)
 # Attendance Management
 @login_required
 @user_passes_test(is_admin)
 def attendance_list(request):
     attendance_records = AttendanceRecord.objects.all().order_by('-date')
     subjects = Subject.objects.all()
-    return render(request, 'admin/attendance/list.html', {
+    return render(request, 'panel/attendance-list.html', {
         'attendance_records': attendance_records,
         'subjects': subjects
     })
@@ -237,7 +277,7 @@ def attendance_add(request):
     else:
         form = AttendanceRecordForm(initial={'date': datetime.now().date()})
     
-    return render(request, 'admin/attendance/add.html', {'form': form})
+    return render(request, 'panel/attendance-add.html', {'form': form})
 
 @login_required
 @user_passes_test(is_admin)
@@ -266,7 +306,7 @@ def attendance_bulk_add(request):
     else:
         form = BulkAttendanceForm(initial={'date': datetime.now().date()})
     
-    return render(request, 'admin/attendance/bulk_add.html', {'form': form})
+    return render(request, 'panel/attendance-bulk_add.html', {'form': form})
 
 @login_required
 @user_passes_test(is_admin)
@@ -281,30 +321,103 @@ def attendance_edit(request, pk):
     else:
         form = AttendanceRecordForm(instance=attendance)
     
-    return render(request, 'admin/attendance/edit.html', {'form': form, 'attendance': attendance})
+    return render(request, 'panel/attendance-edit.html', {'form': form, 'attendance': attendance})
 
 # Quiz Management
 @login_required
 @user_passes_test(is_admin)
 def quiz_list(request):
     quizzes = Quiz.objects.all().order_by('-created_at')
-    return render(request, 'admin/quiz/list.html', {'quizzes': quizzes})
+    return render(request, 'panel/quiz-list.html', {'quizzes': quizzes})
 
 @login_required
 @user_passes_test(is_admin)
-def quiz_create(request):
+def quiz_question_bank(request, quiz_id=None):
+    if quiz_id:
+        quiz = get_object_or_404(Quiz, pk=quiz_id)
+    else:
+        quiz = None
+
     if request.method == 'POST':
-        form = QuizForm(request.POST)
+        if quiz:
+            form = QuizForm(request.POST, instance=quiz)
+        else:
+            form = QuizForm(request.POST)
+        
         if form.is_valid():
             quiz = form.save(commit=False)
             quiz.created_by = request.user
+            quiz.save()  # First save to get a primary key
+            
+            # Delete existing questions if editing
+            if quiz_id:
+                quiz.questions.all().delete()
+            
+            # Process questions if they exist in the request
+            questions_data = request.POST.get('questions')
+            if questions_data:
+                try:
+                    questions_data = json.loads(questions_data)
+                    for q_data in questions_data:
+                        question = Question.objects.create(
+                            quiz=quiz,
+                            question_type=q_data['type'],
+                            content=q_data['text'],
+                            points=q_data.get('points', 1),
+                            order=q_data.get('order', 0),
+                            is_required=q_data.get('is_required', False)
+                        )
+                        
+                        if q_data['type'] == 'multiple_choice':
+                            for c_data in q_data['choices']:
+                                Choice.objects.create(
+                                    question=question,
+                                    text=c_data['text'],
+                                    is_correct=c_data['is_correct']
+                                )
+                        elif q_data['type'] == 'short_answer':
+                            # For short answer questions, create a choice with the correct answer
+                            Choice.objects.create(
+                                question=question,
+                                text=q_data.get('correct_answer', ''),
+                                is_correct=True
+                            )
+                except json.JSONDecodeError as e:
+                    messages.error(request, f'Error processing questions: {str(e)}')
+                    return redirect('admin_quiz')
+            
+            # Update total questions count and points
+            quiz.total_questions = quiz.questions.count()
+            quiz.total_points = sum(question.points for question in quiz.questions.all())
             quiz.save()
-            messages.success(request, 'Quiz created successfully. Now add questions.')
-            return redirect('quiz_add_questions', quiz_id=quiz.id)
+            
+            messages.success(request, 'Quiz saved successfully!')
+            return redirect('admin_quiz')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
-        form = QuizForm()
+        # Handle initial quiz creation from quiz.html
+        if request.GET.get('title'):
+            initial_data = {
+                'title': request.GET.get('title'),
+                'subject': request.GET.get('subject'),
+                'due_date': request.GET.get('due_date'),
+                'time_limit': request.GET.get('time_limit'),
+                'description': request.GET.get('description')
+            }
+            form = QuizForm(initial=initial_data)
+        else:
+            if quiz:
+                form = QuizForm(instance=quiz)
+            else:
+                form = QuizForm()
     
-    return render(request, 'admin/quiz/create.html', {'form': form})
+    context = {
+        'form': form,
+        'subjects': Subject.objects.all(),
+        'quiz': quiz
+    }
+    return render(request, 'panel/quiz-question-bank.html', context)
 
 @login_required
 @user_passes_test(is_admin)
@@ -318,7 +431,7 @@ def quiz_detail(request, pk):
         'questions': questions,
         'results': results
     }
-    return render(request, 'admin/quiz/detail.html', context)
+    return render(request, 'panel/quiz-detail.html', context)
 
 @login_required
 @user_passes_test(is_admin)
@@ -353,7 +466,7 @@ def quiz_add_questions(request, quiz_id):
         'question_form': question_form,
         'choice_formset': choice_formset
     }
-    return render(request, 'admin/quiz/add_questions.html', context)
+    return render(request, 'panel/quiz-add-questions.html', context)
 
 @login_required
 @user_passes_test(is_admin)
@@ -388,7 +501,7 @@ def quiz_edit_question(request, question_id):
 @user_passes_test(is_admin)
 def exam_list(request):
     exams = Exam.objects.all().order_by('-created_at')
-    return render(request, 'admin/exam/list.html', {'exams': exams})
+    return render(request, 'panel/exam-list.html', {'exams': exams})
 
 @login_required
 @user_passes_test(is_admin)
@@ -404,7 +517,7 @@ def exam_create(request):
     else:
         form = ExamForm()
     
-    return render(request, 'admin/exam/create.html', {'form': form})
+    return render(request, 'panel/exam-create.html', {'form': form})
 
 @login_required
 @user_passes_test(is_admin)
@@ -418,7 +531,7 @@ def exam_detail(request, pk):
         'questions': questions,
         'results': results
     }
-    return render(request, 'admin/exam/detail.html', context)
+    return render(request, 'panel/exam-detail.html', context)
 
 @login_required
 @user_passes_test(is_admin)
@@ -453,7 +566,7 @@ def exam_add_questions(request, exam_id):
         'question_form': question_form,
         'choice_formset': choice_formset
     }
-    return render(request, 'admin/exam/add_questions.html', context)
+    return render(request, 'panel/exam-add-questions.html', context)
 
 @login_required
 @user_passes_test(is_admin)
@@ -481,7 +594,40 @@ def exam_edit_question(request, question_id):
         'question_form': question_form,
         'choice_formset': choice_formset
     }
-    return render(request, 'admin/exam/edit_question.html', context)
+    return render(request, 'panel/exam-edit-question.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def exam_responses(request, exam_id):
+    exam = get_object_or_404(Exam, pk=exam_id)
+    results = ExamResult.objects.filter(exam=exam).order_by('-date_taken')
+    context = {
+        'exam': exam,
+        'results': results
+    }
+    return render(request, 'panel/exam-responses.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def grade_exam(request, exam_id, result_id):
+    exam = get_object_or_404(Exam, pk=exam_id)
+    result = get_object_or_404(ExamResult, pk=result_id)
+    
+    if request.method == 'POST':
+        form = ExamResultForm(request.POST, instance=result)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Exam result updated successfully.')
+            return redirect('exam_responses', exam_id=exam_id)
+    else:
+        form = ExamResultForm(instance=result)
+    
+    context = {
+        'exam': exam,
+        'result': result,
+        'form': form
+    }
+    return render(request, 'panel/exam-grade.html', context)
 
 #student dashboard
 @login_required
@@ -511,8 +657,49 @@ def student_profile(request):
 @user_passes_test(is_student)
 def student_attendance(request):
     student = get_object_or_404(StudentProfile, user=request.user)
+    
+    # Get filter parameters
+    subject_filter = request.GET.get('subject')
+    date_filter = request.GET.get('date')
+    status_filter = request.GET.get('status')
+
+    # Base queryset
     records = AttendanceRecord.objects.filter(student=student).order_by('-date')
-    return render(request, 'student/attendance.html', {'records': records})
+
+    # Apply filters
+    if subject_filter:
+        records = records.filter(subject_id=subject_filter)
+    if date_filter:
+        records = records.filter(date=date_filter)
+    if status_filter:
+        records = records.filter(status=status_filter)
+    
+    # Calculate statistics
+    total_classes = records.count()
+    present_count = records.filter(status='Present').count()
+    absent_count = records.filter(status='Absent').count()
+    late_count = records.filter(status='Late').count()
+    
+    # Calculate percentages
+    present_percentage = (present_count / total_classes * 100) if total_classes > 0 else 0
+    absent_percentage = (absent_count / total_classes * 100) if total_classes > 0 else 0
+    late_percentage = (late_count / total_classes * 100) if total_classes > 0 else 0
+    
+    context = {
+        'records': records,
+        'subjects': Subject.objects.all(),
+        'selected_subject': subject_filter,
+        'selected_date': date_filter,
+        'selected_status': status_filter,
+        'total_classes': total_classes,
+        'present_count': present_count,
+        'absent_count': absent_count,
+        'late_count': late_count,
+        'present_percentage': present_percentage,
+        'absent_percentage': absent_percentage,
+        'late_percentage': late_percentage,
+    }
+    return render(request, 'student/attendance.html', context)
 #student quizzes
 @login_required
 @user_passes_test(is_student)
@@ -543,3 +730,140 @@ def student_exams(request):
         'taken_exam_ids': taken_exam_ids,
     }
     return render(request, 'student/exam/list.html', context)
+
+@login_required
+@user_passes_test(is_student)
+def take_exam(request, exam_id):
+    exam = get_object_or_404(Exam, pk=exam_id)
+    student = request.user.studentprofile
+    
+    # Check if student has already taken this exam
+    if ExamResult.objects.filter(student=student, exam=exam).exists():
+        messages.warning(request, 'You have already taken this exam.')
+        return redirect('student_exams')
+    
+    if request.method == 'POST':
+        # Process exam submission
+        score = float(request.POST.get('score', 0))
+        
+        # Create exam result
+        result = ExamResult.objects.create(
+            student=student,
+            exam=exam,
+            score=score,
+            date_taken=timezone.now()
+        )
+        
+        messages.success(request, 'Exam submitted successfully!')
+        return redirect('student_exams')
+    
+    context = {
+        'exam': exam
+    }
+    return render(request, 'student/exam/take_exam.html', context)
+
+@login_required
+@user_passes_test(is_student)
+def student_quiz(request):
+    student = get_object_or_404(StudentProfile, user=request.user)
+    quizzes = Quiz.objects.filter(is_published=True, is_active=True)
+    quiz_results = QuizResult.objects.filter(student=student)
+    taken_quiz_ids = quiz_results.values_list('quiz_id', flat=True)
+
+    context = {
+        'quizzes': quizzes,
+        'quiz_results': quiz_results,
+        'taken_quiz_ids': taken_quiz_ids,
+    }
+    return render(request, 'student/quiz.html', context)
+
+@login_required
+@user_passes_test(is_student)
+def take_quiz(request, quiz_id):
+    quiz = get_object_or_404(Quiz, pk=quiz_id, is_published=True, is_active=True)
+    student = get_object_or_404(StudentProfile, user=request.user)
+    
+    # Check if student has already taken the quiz
+    existing_result = QuizResult.objects.filter(quiz=quiz, student=student).first()
+    if existing_result and existing_result.is_completed:
+        messages.warning(request, 'You have already completed this quiz.')
+        return redirect('student_quiz')
+    
+    if request.method == 'POST':
+        # Create or get quiz result
+        quiz_result = existing_result or QuizResult.objects.create(
+            quiz=quiz,
+            student=student,
+            total_points=quiz.total_points
+        )
+        
+        # Process answers
+        for question in quiz.questions.all():
+            if question.question_type == 'multiple_choice':
+                selected_choice_id = request.POST.get(f'choice_{question.id}')
+                if selected_choice_id:
+                    selected_choice = Choice.objects.get(pk=selected_choice_id)
+                    StudentAnswer.objects.create(
+                        quiz_result=quiz_result,
+                        question=question,
+                        selected_choice=selected_choice
+                    )
+            else:
+                answer_text = request.POST.get(f'answer_{question.id}')
+                if answer_text:
+                    StudentAnswer.objects.create(
+                        quiz_result=quiz_result,
+                        question=question,
+                        answer_text=answer_text
+                    )
+        
+        quiz_result.is_completed = True
+        quiz_result.date_submitted = timezone.now()
+        quiz_result.save()
+        
+        messages.success(request, 'Quiz submitted successfully!')
+        return redirect('student_quiz')
+    
+    context = {
+        'quiz': quiz,
+        'questions': quiz.questions.order_by('order')
+    }
+    return render(request, 'student/quiz-take.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def quiz_responses(request, quiz_id):
+    quiz = get_object_or_404(Quiz, pk=quiz_id)
+    results = QuizResult.objects.filter(quiz=quiz, is_completed=True)
+    
+    context = {
+        'quiz': quiz,
+        'results': results
+    }
+    return render(request, 'panel/quiz-responses.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def grade_quiz(request, quiz_id, result_id):
+    quiz_result = get_object_or_404(QuizResult, pk=result_id, quiz_id=quiz_id)
+    
+    if request.method == 'POST':
+        for answer in quiz_result.answers.all():
+            if answer.question.question_type == 'short_answer':
+                is_correct = request.POST.get(f'correct_{answer.id}') == 'true'
+                answer.is_correct = is_correct
+                answer.points_earned = answer.question.points if is_correct else 0
+                answer.feedback = request.POST.get(f'feedback_{answer.id}', '')
+                answer.save()
+        
+        quiz_result.is_graded = True
+        quiz_result.save()
+        
+        messages.success(request, 'Quiz graded successfully!')
+        return redirect('quiz_responses', quiz_id=quiz_id)
+    
+    context = {
+        'quiz_result': quiz_result,
+        'answers': quiz_result.answers.select_related('question').order_by('question__order')
+    }
+    return render(request, 'panel/quiz-student-response.html', context)
