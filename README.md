@@ -3,7 +3,7 @@
 A web-based management system built with Django, designed to streamline academic administration and student management processes.
 
 ## Key Features
-
+#### Note: Taylored in Desktop View Only!!
 ### Student Management
 - Admin approval system for new student registrations
 - Student profile management with photo upload capability
