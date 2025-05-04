@@ -4,6 +4,8 @@ A web-based management system built with Django, designed to streamline academic
 
 ## Key Features
 #### Note: Taylored in Desktop View Only!!
+
+![Image](https://github.com/user-attachments/assets/dc439860-2be0-4530-96f4-685feffff045)
 ### Student Management
 - Admin approval system for new student registrations
 - Student profile management with photo upload capability
