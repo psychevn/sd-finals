@@ -1,14 +1,12 @@
-# Student Management System
+# Acadex
 
-A web-based student management system built with Django, designed to streamline academic administration and student management processes.
+A web-based management system built with Django, designed to streamline academic administration and student management processes.
 
 ## Key Features
 
 ### Student Management
-- Student registration with email verification
 - Admin approval system for new student registrations
 - Student profile management with photo upload capability
-- Course and section assignment
 - Attendance tracking by subject
 
 ### Academic Management
