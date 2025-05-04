@@ -1,0 +1,149 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Student Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap">
+  <link rel="stylesheet" href="{% static 'css/quiz-stdnt-view.css' %}">
+</head>
+<body>
+  
+  <div class="quiz-admin-container">
+   <!-- Navigation Sidebar -->
+   <div class="exam-admin-navigation">
+    <div class="logo-container"></div>
+    <div class="nav-buttons-container">
+      <a href="{% url 'student_dashboard' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+        <img src="{% static 'public3/external/dashboardlayout2136-pwh-200w.png' %}" alt="Dashboard" class="nav-icon">
+        <span>Dashboard</span>
+      </div></a>
+      
+      <a href="{% url 'student_dashboard' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+        <img src="{% static 'public3/external/studentmale1812-d0q-200h.png' %}" alt="Students" class="nav-icon">
+        <span>Profile</span>
+      </div></a>
+      
+      <a href="{% url 'student_attendance' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+        <img src="{% static 'public3/external/attendance7018-1v4-200h.png' %}" alt="Attendance" class="nav-icon">
+        <span>Attendance</span>
+      </div></a>
+      
+      <a href="{% url 'student_quiz' %}" style="text-decoration: none;"><div class="nav-button active" style="border:  #854BAB 1px solid;">
+        <img src="{% static 'public3/external/quiz2137-2g3-200h.png' %}" alt="Quiz" class="nav-icon">
+        <span>Quiz</span>
+      </div></a>
+      
+      <a href="{% url 'student_exam' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+        <img src="{% static 'public3/external/exam2137-tdwn-200w.png' %}" alt="Exam" class="nav-icon">
+        <span>Exam</span>
+        </div></a>
+      </div>
+    </div>
+  <div class="main-content">
+    <div class="header">
+      <div class="page-title">
+        <img src="{% static 'public3/external/quiz2137-3uc7-200h.png' %}" alt="Quiz">
+        <h1>Quiz Page</h1>
+      </div>
+      <div class="user-profile">
+        <button class="account-button" onclick="toggleAccountMenu()">
+          <img src="{% if student.profile_picture %}{{ student.profile_picture.url }}{% else %}{% static 'public3/external/testaccount2136-0qlo-200w.png' %}{% endif %}" alt="Account" class="profile-picture">
+        </button>
+        
+        <!-- Account Dropdown Menu -->
+        <div id="accountMenu" class="account-menu">
+          <a href="{% url 'logout' %}">Logout</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="exam-section">
+      <div class="exam-list">
+        {% for quiz in quizzes %}
+        <div class="exam-card">
+          <div class="exam-info">
+            <div class="exam-name">{{ quiz.title }} - {{ quiz.subject.name }}</div>
+            <div class="exam-details">
+              <span>Questions: {{ quiz.total_questions }}</span>
+              <span>Points: {{ quiz.total_points }}</span>
+              <span>Due: {{ quiz.due_date|date:"F j, Y" }}</span>
+            </div>
+          </div>
+          <div class="exam-status {% if quiz in completed_quizzes %}status-recorded{% else %}status-pending{% endif %}">
+            {% if quiz in completed_quizzes %}Completed{% else %}Pending{% endif %}
+          </div>
+          <div class="exam-action">
+            {% if quiz in completed_quizzes %}
+              <a href="{% url 'quiz_result' quiz.id %}" class="action-button">Result</a>
+            {% else %}
+              <a href="{% url 'quiz_take' quiz.id %}" class="action-button">Take</a>
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <div class="no-quizzes">
+          <p>No quizzes available at the moment.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script>
+    // Add navigation functionality
+    document.querySelectorAll('.nav-button').forEach(button => {
+      button.addEventListener('click', function() {
+        // Remove active class from all buttons
+        document.querySelectorAll('.nav-button').forEach(btn => {
+          btn.classList.remove('active');
+          btn.querySelector('span').style.color = 'rgba(133, 75, 171, 1)';
+        });
+        
+        // Add active class to clicked button
+        this.classList.add('active');
+        this.querySelector('span').style.color = 'white';
+        
+        // Here you would typically navigate to the selected page
+        // For now, we'll just log the selection
+        console.log('Navigating to:', this.querySelector('span').textContent);
+      });
+    });
+
+    // Add button functionality
+    document.querySelectorAll('.action-button').forEach(button => {
+      button.addEventListener('click', function() {
+        const action = this.textContent;
+        const examName = this.closest('.exam-card').querySelector('.exam-name').textContent;
+        
+        if (action === 'Take') {                                                    
+          alert(`Starting exam: ${examName}`);
+          // Here you would typically redirect to the exam page
+        } else if (action === 'Result') {
+          alert(`Showing results for: ${examName}`);
+          // Here you would typically redirect to the results page
+        }
+      });
+    });
+  </script>
+  <script>
+    // Toggle account menu
+function toggleAccountMenu() {
+  const menu = document.getElementById('accountMenu');
+  menu.classList.toggle('active');
+}
+
+// Close account menu when clicking outside
+document.addEventListener('click', function(event) {
+  const accountMenu = document.getElementById('accountMenu');
+  const accountButton = document.querySelector('.account-button');
+  
+  if (!accountButton.contains(event.target) && !accountMenu.contains(event.target)) {
+    accountMenu.classList.remove('active');
+  }
+});
+  </script>
+</body>
+</html>

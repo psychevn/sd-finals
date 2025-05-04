@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <title>Exam Responses</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/exam-responses.css' %}">
+  <style>
+    .alert {
+      padding: 15px;
+      margin-bottom: 20px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+    }
+    .alert-success {
+      color: #3c763d;
+      background-color: #dff0d8;
+      border-color: #d6e9c6;
+    }
+    .alert-error {
+      color: #a94442;
+      background-color: #f2dede;
+      border-color: #ebccd1;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-responses-container">
+    <!-- Navigation Sidebar -->
+    <div class="exam-admin-navigation">
+      <div class="logo-container"></div>
+      <div class="nav-buttons-container">
+        <a href="{% url 'admin_dashboard' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/dashboardlayout2136-pwh-200w.png' %}" alt="Dashboard" class="nav-icon">
+          <span>Dashboard</span>
+        </div></a>
+        
+        <a href="{% url 'admin_students' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/studentmale2134-uejm-200h.png' %}" alt="Students" class="nav-icon">
+          <span>Students</span>
+        </div></a>
+        
+        <a href="{% url 'admin_attendance' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/attendance7018-1v4-200h.png' %}" alt="Attendance" class="nav-icon">
+          <span>Attendance</span>
+        </div></a>
+        
+        <a href="{% url 'admin_quiz' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/quiz2134-ijk5-200h.png' %}" alt="Quiz" class="nav-icon">
+          <span>Quiz</span>
+        </div></a>
+        
+        <a href="{% url 'admin_exam' %}" style="text-decoration: none;"><div class="nav-button active">
+          <img src="{% static 'public3/external/exam2134-f15t-200w.png' %}" alt="Exam" class="nav-icon">
+          <span>Exam</span>
+        </div></a>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <header class="header">
+        <div class="header-title">
+          <img src="{% static 'public3/external/exam2132-u17d-200h.png' %}" alt="Exam Icon">
+          <h1>Exam Responses</h1>
+        </div>
+        <div class="user-profile">
+          <button class="account-button" onclick="toggleAccountMenu()">
+            <img src="{% static 'public3/external/testaccount1812-au0p-200w.png' %}" alt="User">
+          </button>
+          <div id="accountMenu" class="account-menu">
+            <a href="{% url 'logout' %}">Logout</a>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-area">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <div class="quiz-title">
+          <h2>{{ exam.title }} - {{ exam.subject.name }}</h2>
+          <div class="quiz-meta">
+            <span>Questions: {{ exam.total_questions }}</span>
+            <span>Points: {{ exam.total_points }}</span>
+            <span>Due: {{ exam.due_date|date:"F j, Y" }}</span>
+          </div>
+        </div>
+
+        <div class="responses-list">
+          {% for result in results %}
+          <a href="{% url 'grade_exam' exam_id=exam.id result_id=result.id %}" class="response-item" style="background: white;">
+            <div class="student-info">
+              <span class="student-name">{{ result.student.user.get_full_name }}</span>
+              <div class="result-info">
+                <span class="result-label">Score:</span>
+                <span class="result-score">{{ result.score }}/{{ exam.total_points }}</span>
+              </div>
+            </div>
+            <div class="response-meta">
+              <span class="date-taken">Taken: {{ result.date_taken|date:"F j, Y g:i A" }}</span>
+              <span class="status {% if result.is_graded %}graded{% else %}pending{% endif %}">
+                {% if result.is_graded %}Graded{% else %}Pending{% endif %}
+              </span>
+            </div>
+          </a>
+          {% empty %}
+          <div class="no-responses">
+            <p>No responses yet.</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle account menu
+    function toggleAccountMenu() {
+      const menu = document.getElementById('accountMenu');
+      menu.classList.toggle('active');
+    }
+    
+    // Close account menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const accountMenu = document.getElementById('accountMenu');
+      const accountButton = document.querySelector('.account-button');
+      
+      if (!accountButton.contains(event.target) && !accountMenu.contains(event.target)) {
+        accountMenu.classList.remove('active');
+      }
+    });
+
+    // Auto-hide success messages after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+      const alerts = document.querySelectorAll('.alert');
+      alerts.forEach(function(alert) {
+        setTimeout(function() {
+          alert.style.display = 'none';
+        }, 5000);
+      });
+    });
+  </script>
+</body>
+</html>

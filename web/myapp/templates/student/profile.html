@@ -1,0 +1,222 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Student Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/animate.css@4.1.1/animate.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Montserrat:wght@100..900&display=swap">
+    <link rel="stylesheet" href="{% static 'css/student-profile.css' %}">
+</head>
+<body>
+    <div class="student-profile-container">
+        <div class="student-profile-student-profile">
+            <!-- Navigation Sidebar -->
+            <div class="exam-admin-navigation">
+                <div class="logo-container"></div>
+                <div class="nav-buttons-container">
+                    <a href="{% url 'student_dashboard' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+                        <img src="{% static 'public3/external/dashboardlayout2136-pwh-200w.png' %}" alt="Dashboard" class="nav-icon">
+                        <span>Dashboard</span>
+                    </div></a>
+                    <a href="{% url 'student_profile' %}" style="text-decoration: none;"><div class="nav-button active" style="border:  #854BAB 1px solid;">
+                        <img src="{% static 'public3/external/studentmale3106-ghd-200h.png' %}" alt="Students" class="nav-icon">
+                        <span>Profile</span>
+                    </div></a>
+                    <a href="{% url 'student_attendance' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+                        <img src="{% static 'public3/external/attendance7018-1v4-200h.png' %}" alt="Attendance" class="nav-icon">
+                        <span>Attendance</span>
+                    </div></a>
+                    <a href="{% url 'student_quiz' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+                        <img src="{% static 'public3/external/quiz2132-4d4n-200h.png' %}" alt="Quiz" class="nav-icon">
+                        <span>Quiz</span>
+                    </div></a>
+                    <a href="{% url 'student_exam' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+                        <img src="{% static 'public3/external/exam2137-tdwn-200w.png' %}" alt="Exam" class="nav-icon">
+                        <span>Exam</span>
+                    </div></a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="student-profile-frame1">
+                    <img src="{% static 'public3/external/studentmale2133-osu-200h.png' %}" alt="Profile Icon">
+                    <h1>Student Profile</h1>
+                </div>
+
+                <div class="student-profile-frame8">
+                    <form id="profilePicForm" method="post" enctype="multipart/form-data" style="display:inline;">
+                        {% csrf_token %}
+                        <label for="profilePicInput" style="cursor:pointer;">
+                            <img id="profilePicDisplay" src="{% if student.profile_picture %}{{ student.profile_picture.url }}{% else %}{% static 'public3/external/testaccount2136-0qlo-200w.png' %}{% endif %}" alt="Student Photo" class="profile-photo">
+                        </label>
+                        <input type="file" id="profilePicInput" name="profile_picture" accept="image/*" style="display:none;" onchange="document.getElementById('profilePicForm').submit();">
+                    </form>
+                    <div class="profile-info">
+                        <h2>{{ student.user.get_full_name }}</h2>
+                        <p>Student Number: <span>{{ student.student_number }}</span></p>
+                    </div>
+                </div>
+
+                <div class="student-profile-frame9">
+                    <form id="profileForm" method="post" action="" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <!-- Profile Data Rows with Editable Inputs -->
+                        <div class="data-row">
+                            <div class="data-label">Full Name</div>
+                            <div class="data-value">
+                                <span class="info-text">{{ student.user.get_full_name }}</span>
+                                <input type="text" name="full_name" class="info-input" value="{{ student.user.get_full_name }}" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="data-row">
+                            <div class="data-label">Email</div>
+                            <div class="data-value">
+                                <span class="info-text">{{ student.user.email }}</span>
+                                <input type="email" name="email" class="info-input" value="{{ student.user.email }}" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="data-row">
+                            <div class="data-label">Phone</div>
+                            <div class="data-value">
+                                <span class="info-text">{{ student.phone }}</span>
+                                <input type="text" name="phone" class="info-input" value="{{ student.phone }}" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="data-row">
+                            <div class="data-label">Birthday</div>
+                            <div class="data-value">
+                                <span class="info-text">{{ student.birthday|date:'Y-m-d' }}</span>
+                                <input type="date" name="birthday" class="info-input" value="{{ student.birthday|date:'Y-m-d' }}" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="data-row">
+                            <div class="data-label">Section</div>
+                            <div class="data-value">
+                                <span class="info-text">{{ student.section }}</span>
+                                <input type="text" name="section" class="info-input" value="{{ student.section }}" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="data-row">
+                            <div class="data-label">Course</div>
+                            <div class="data-value">
+                                <span class="info-text">{{ student.course }}</span>
+                                <input type="text" name="course" class="info-input" value="{{ student.course }}" style="display: none;">
+                            </div>
+                        </div>
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <button type="button" class="edit-button" onclick="toggleEditMode()">Edit Profile</button>
+                        </div>
+                        <!-- Save/Cancel Buttons -->
+                        <div class="save-changes-container" style="display: none;">
+                            <button type="submit" class="save-button">Save Changes</button>
+                            <button type="button" class="cancel-button" onclick="cancelEdit()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- User Account Button -->
+                <button class="account-button" onclick="toggleAccountMenu()">
+                    <img src="{% if student.profile_picture %}{{ student.profile_picture.url }}{% else %}{% static 'public3/external/testaccount2136-0qlo-200w.png' %}{% endif %}" alt="Account">
+                </button>
+
+                <!-- Account Dropdown Menu -->
+                <div id="accountMenu" class="account-menu">
+                    <a href="{% url 'logout' %}">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation function
+        function navigate(page) {
+            console.log(`Navigating to ${page}`);
+            // Remove active class from all buttons
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Add active class to clicked button
+            event.currentTarget.classList.add('active');
+            // Here you would typically load the appropriate content
+        }
+
+        // Handle combo box selection
+        function handleActionChange() {
+            const action = document.getElementById('actionDropdown').value;
+            if (action) {
+                alert(`Selected action: ${action}`);
+                // Here you would handle the selected action
+            }
+        }
+
+        // Toggle account menu
+        function toggleAccountMenu() {
+            const menu = document.getElementById('accountMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Close account menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const accountMenu = document.getElementById('accountMenu');
+            const accountButton = document.querySelector('.account-button');
+            
+            if (!accountButton.contains(event.target) && !accountMenu.contains(event.target)) {
+                accountMenu.style.display = 'none';
+            }
+        });
+
+        // Toggle edit mode
+        function toggleEditMode() {
+            const container = document.querySelector('.student-profile-frame9');
+            container.classList.toggle('editing');
+
+            const saveContainer = document.querySelector('.save-changes-container');
+            saveContainer.style.display = container.classList.contains('editing') ? 'flex' : 'none';
+
+            const inputs = document.querySelectorAll('.info-input');
+            const spans = document.querySelectorAll('.info-text');
+
+            inputs.forEach((input, index) => {
+                if (container.classList.contains('editing')) {
+                    spans[index].style.display = 'none';
+                    input.style.display = 'inline-block';
+                } else {
+                    spans[index].style.display = 'inline-block';
+                    input.style.display = 'none';
+                }
+            });
+
+            if (container.classList.contains('editing')) {
+                inputs[0].focus();
+            }
+        }
+
+        // Save changes function
+        function saveChanges() {
+            const inputs = document.querySelectorAll('.info-input');
+            inputs.forEach(input => {
+                const textSpan = input.previousElementSibling;
+                textSpan.textContent = input.value;
+            });
+
+            toggleEditMode(); // Exit edit mode
+            alert('Changes saved successfully!');
+        }
+
+        // Cancel edit function
+        function cancelEdit() {
+            const inputs = document.querySelectorAll('.info-input');
+            inputs.forEach(input => {
+                const textSpan = input.previousElementSibling;
+                input.value = textSpan.textContent;
+            });
+
+            toggleEditMode(); // Exit edit mode
+        }
+    </script>
+</body>
+</html>

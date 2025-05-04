@@ -1,0 +1,538 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Navigation Sidebar -->
+    <div class="exam-admin-navigation">
+      <div class="logo-container"></div>
+      <div class="nav-buttons-container">
+        <a href="{% url 'admin_dashboard' %}" style="text-decoration: none;"><div class="nav-button active" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/dashboardlayout2134-c0wj-200w.png' %}" alt="Dashboard" class="nav-icon">
+          <span>Dashboard</span>
+        </div></a>
+        
+        <a href="{% url 'admin_students' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/studentmale2134-uejm-200h.png' %}" alt="Students" class="nav-icon">
+          <span>Students</span>
+        </div></a>
+        
+        <a href="{% url 'admin_attendance' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/attendance7018-1v4-200h.png' %}" alt="Attendance" class="nav-icon">
+          <span>Attendance</span>
+        </div></a>
+        
+        <a href="{% url 'admin_quiz' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/quiz2134-ijk5-200h.png' %}" alt="Quiz" class="nav-icon">
+          <span>Quiz</span>
+        </div></a>
+        
+        <a href="{% url 'admin_exam' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/exam2135-e79-200h.png' %}" alt="Exam" class="nav-icon">
+          <span>Exam</span>
+        </div></a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <header class="header">
+        <div class="header-title">
+          <img src="{% static 'public3/external/dashboardlayout2023-tbkt-200w.png' %}" alt="Dashboard">
+          <h1>Admin Dashboard</h1>
+        </div>
+<!-- Replace the existing user-profile div with this: -->
+      <div class="user-profile">
+        <button class="account-button" onclick="toggleAccountMenu()">
+          <img src="{% static 'public3/external/testaccount1812-au0p-200w.png' %}" alt="User">
+        </button>
+        
+        <!-- Account Dropdown Menu -->
+        <div id="accountMenu" class="account-menu">
+          <a href="{% url 'logout' %}">Logout</a>
+        </div>
+      </div>
+      </header>
+
+      <div class="content-section">
+        {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+          <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="welcome-section">
+          <h2>Welcome Admin!</h2>
+          <p>Welcome to the admin dashboard.<br> Here you can manage your students, attendance, quizzes, and exams.</p>
+        </div>
+        
+        <section class="overview-section">
+          <h3>Overview</h3>
+          <div class="stats-cards">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <img src="{% static 'public3/external/studentmale7324-4qi-200h.png' %}" alt="Students">
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ total_students }}</span>
+                <span class="stat-label">Enrolled Students</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon">
+                <img src="{% static 'public3/external/studentmale7324-4qi-200h.png' %}" alt="Attendance">
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ students_attended_today }}</span>
+                <span class="stat-label">Students Attended Today</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon">
+                <img src="{% static 'public3/external/studentmale7324-4qi-200h.png' %}" alt="Tasks">
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ total_pending_tasks }}</span>
+                <span class="stat-label">Pending Tasks (Quizzes/Exams to Grade)</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">
+                <img src="{% static 'public3/external/studentmale7324-4qi-200h.png' %}" alt="Pending Approvals">
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ pending_students.count }}</span>
+                <span class="stat-label">Pending Student Approvals</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Approvals Section -->
+          {% if pending_students %}
+          <div class="pending-approvals">
+            <h2>Pending Student Approvals</h2>
+            <div class="approval-list">
+              {% for student in pending_students %}
+              <div class="approval-item">
+                <div class="student-info">
+                  <span class="student-name">{{ student.user.get_full_name }}</span>
+                  <span class="student-number">({{ student.student_number }})</span>
+                  <span class="registration-date">Registered: {{ student.date_registered|date:"M d, Y" }}</span>
+                </div>
+                <button class="review-btn" 
+                  data-student-id="{{ student.id }}"
+                  data-student-name="{{ student.user.get_full_name }}"
+                  data-student-number="{{ student.student_number }}"
+                  data-student-section="{{ student.section }}"
+                  data-student-course="{{ student.course }}"
+                  data-student-email="{{ student.user.email }}"
+                  data-student-birthday="{{ student.birthday|date:'Y-m-d' }}"
+                  onclick="openApprovalModal(this)">Review</button>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Approval Modal -->
+          <div id="approvalModal" class="modal">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h2>Review Student Registration</h2>
+                <span class="close" onclick="closeApprovalModal()">&times;</span>
+              </div>
+              <div class="modal-body">
+                <div class="student-details">
+                  <p><strong>Name:</strong> <span id="modalName"></span></p>
+                  <p><strong>Student Number:</strong> <span id="modalStudentNumber"></span></p>
+                  <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+                  <p><strong>Section:</strong> <span id="modalSection"></span></p>
+                  <p><strong>Course:</strong> <span id="modalCourse"></span></p>
+                  <p><strong>Birthday:</strong> <span id="modalBirthday"></span></p>
+                </div>
+                <div class="approval-actions">
+                  <form id="approvalForm" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" id="action">
+                    <button type="button" class="approve-btn" onclick="submitApproval('approve')">Approve</button>
+                    <button type="button" class="decline-btn" onclick="submitApproval('decline')">Decline</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <style>
+            .pending-approvals {
+              margin-top: 2rem;
+              background: white;
+              border-radius: 8px;
+              padding: 1.5rem;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+
+            .approval-list {
+              margin-top: 1rem;
+            }
+
+            .approval-item {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 1rem;
+              border-bottom: 1px solid #eee;
+            }
+
+            .student-info {
+              display: flex;
+              gap: 1rem;
+              align-items: center;
+            }
+
+            .student-name {
+              font-weight: 600;
+            }
+
+            .student-number {
+              color: #666;
+            }
+
+            .registration-date {
+              color: #888;
+              font-size: 0.9rem;
+            }
+
+            .review-btn {
+              background: rgba(133, 75, 171, 1); 
+              color: white;
+              border: none;
+              padding: 0.5rem 1rem;
+              border-radius: 4px;
+              cursor: pointer;
+            }
+
+            .review-btn:hover {
+              background: rgba(103, 55, 141, 1);
+            }
+
+            .modal {
+              display: none;
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(0,0,0,0.5);
+              z-index: 1000;
+            }
+
+            .modal-content {
+              background: white;
+              width: 90%;
+              max-width: 600px;
+              margin: 2rem auto;
+              border-radius: 8px;
+              box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+
+            .modal-header {
+              padding: 1rem;
+              border-bottom: 1px solid #eee;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+
+            .modal-body {
+              padding: 1.5rem;
+            }
+
+            .student-details {
+              margin-bottom: 1.5rem;
+            }
+
+            .student-details p {
+              margin: 0.5rem 0;
+            }
+
+            .approval-actions {
+              display: flex;
+              gap: 1rem;
+              justify-content: flex-end;
+            }
+
+            .approve-btn, .decline-btn {
+              padding: 0.5rem 1.5rem;
+              border: none;
+              border-radius: 4px;
+              cursor: pointer;
+              font-weight: 500;
+            }
+
+            .approve-btn {
+              background: #4CAF50;
+              color: white;
+            }
+
+            .decline-btn {
+              background: #f44336;
+              color: white;
+            }
+
+            .approve-btn:hover {
+              background: #45a049;
+            }
+
+            .decline-btn:hover {
+              background: #da190b;
+            }
+
+            .close {
+              font-size: 1.5rem;
+              cursor: pointer;
+              color: #666;
+            }
+
+            .close:hover {
+              color: #000;
+            }
+
+            .messages {
+              margin-bottom: 1rem;
+            }
+            
+            .alert {
+              padding: 1rem;
+              border-radius: 4px;
+              margin-bottom: 0.5rem;
+            }
+            
+            .alert-success {
+              background-color: #d4edda;
+              color: #155724;
+              border: 1px solid #c3e6cb;
+            }
+            
+            .alert-error {
+              background-color: #f8d7da;
+              color: #721c24;
+              border: 1px solid #f5c6cb;
+            }
+          </style>
+
+          <script>
+            let currentStudentId = null;
+
+            function openApprovalModal(button) {
+              const modal = document.getElementById('approvalModal');
+              currentStudentId = button.getAttribute('data-student-id');
+              
+              // Set modal content
+              document.getElementById('modalName').textContent = button.getAttribute('data-student-name');
+              document.getElementById('modalStudentNumber').textContent = button.getAttribute('data-student-number');
+              document.getElementById('modalSection').textContent = button.getAttribute('data-student-section');
+              document.getElementById('modalCourse').textContent = button.getAttribute('data-student-course');
+              document.getElementById('modalEmail').textContent = button.getAttribute('data-student-email');
+              document.getElementById('modalBirthday').textContent = button.getAttribute('data-student-birthday');
+              
+              // Show the modal
+              modal.style.display = 'block';
+            }
+
+            function submitApproval(action) {
+              if (!currentStudentId) {
+                alert('Error: Student ID not found');
+                return;
+              }
+
+              const form = document.getElementById('approvalForm');
+              const actionInput = document.getElementById('action');
+              
+              // Set the form action with the correct student ID
+              const url = `/panel/approve-student/${currentStudentId}/`;
+              
+              // Set the action value
+              actionInput.value = action;
+              
+              // Get CSRF token
+              const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+              
+              // Create FormData object
+              const formData = new FormData(form);
+              
+              // Submit the form using fetch
+              fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                  'X-CSRFToken': csrfToken
+                },
+                credentials: 'same-origin',
+                redirect: 'follow'  // Follow redirects
+              })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                // Close the modal
+                const modal = document.getElementById('approvalModal');
+                modal.style.display = 'none';
+                // Reload the page to show updated status
+                window.location.reload();
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                alert('Error approving student. Please try again. If the problem persists, please contact the administrator.');
+              });
+            }
+
+            function closeApprovalModal() {
+              const modal = document.getElementById('approvalModal');
+              modal.style.display = 'none';
+              currentStudentId = null;
+            }
+
+            // Function to close modal when clicking outside
+            window.onclick = function(event) {
+              const modal = document.getElementById('approvalModal');
+              if (event.target == modal) {
+                modal.style.display = 'none';
+                currentStudentId = null;
+              }
+            }
+          </script>
+        </section>
+
+        <section class="calendar-section">
+          <h3>Calendar</h3>
+          <div class="calendar-widget" id="calendar">
+            <!-- Calendar will be inserted here by JavaScript -->
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript embedded directly -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Navigation functionality
+      const navButtons = document.querySelectorAll('.nav-button');
+      
+      navButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // Remove active class from all buttons
+          navButtons.forEach(btn => btn.classList.remove('active'));
+          
+          // Add active class to clicked button
+          this.classList.add('active');
+          
+          // Log page
+          const page = this.getAttribute('data-page');
+          console.log(`Loading page: ${page}`);
+        });
+      });
+
+      // Calendar functionality
+      function renderCalendar() {
+        const calendarEl = document.getElementById('calendar');
+        const today = new Date();
+        const currentMonth = today.getMonth();
+        const currentYear = today.getFullYear();
+        
+        // Get first day of month and total days in month
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        
+        // Get days from previous month to display
+        const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
+        
+        // Calendar HTML
+        let calendarHTML = `
+          <div class="calendar-header">
+            <div class="calendar-title">${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}</div>
+            <div class="calendar-nav">
+              <button id="prev-month"><i class="fas fa-chevron-left"></i></button>
+              <button id="next-month"><i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
+          <div class="calendar-grid">
+            <div class="calendar-day-header">Sun</div>
+            <div class="calendar-day-header">Mon</div>
+            <div class="calendar-day-header">Tue</div>
+            <div class="calendar-day-header">Wed</div>
+            <div class="calendar-day-header">Thu</div>
+            <div class="calendar-day-header">Fri</div>
+            <div class="calendar-day-header">Sat</div>
+        `;
+        
+        // Previous month days
+        for (let i = firstDay - 1; i >= 0; i--) {
+          calendarHTML += `<div class="calendar-day other-month">${prevMonthDays - i}</div>`;
+        }
+        
+        // Current month days
+        for (let i = 1; i <= daysInMonth; i++) {
+          const isToday = i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+          calendarHTML += `<div class="calendar-day ${isToday ? 'today' : ''}">${i}</div>`;
+        }
+        
+        // Next month days (to fill the grid)
+        const totalCells = firstDay + daysInMonth;
+        const remainingCells = totalCells <= 35 ? 35 - totalCells : 42 - totalCells;
+        
+        for (let i = 1; i <= remainingCells; i++) {
+          calendarHTML += `<div class="calendar-day other-month">${i}</div>`;
+        }
+        
+        calendarHTML += `</div>`;
+        calendarEl.innerHTML = calendarHTML;
+        
+        // Add event listeners to navigation buttons
+        document.getElementById('prev-month')?.addEventListener('click', () => {
+          console.log('Previous month clicked');
+        });
+        
+        document.getElementById('next-month')?.addEventListener('click', () => {
+          console.log('Next month clicked');
+        });
+      }
+      
+      // Initialize calendar
+      renderCalendar();
+    });
+  </script>
+  <script>
+    // Toggle account menu
+    function toggleAccountMenu() {
+      const menu = document.getElementById('accountMenu');
+      menu.classList.toggle('active');
+    }
+    
+    // Close account menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const accountMenu = document.getElementById('accountMenu');
+      const accountButton = document.querySelector('.account-button');
+      
+      if (!accountButton.contains(event.target) && !accountMenu.contains(event.target)) {
+        accountMenu.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

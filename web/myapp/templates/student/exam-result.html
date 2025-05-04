@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Student Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+  <link rel="stylesheet" href="{% static 'css/student-exam-result.css' %}">
+</head>
+<body>
+  <div class="exam-responses-admin-container">
+    <!-- Navigation Sidebar -->
+    <div class="exam-admin-navigation">
+      <div class="logo-container"></div>
+      <div class="nav-buttons-container">
+        <a href="{% url 'student_dashboard' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/dashboardlayout2136-pwh-200w.png' %}" alt="Dashboard" class="nav-icon">
+          <span>Dashboard</span>
+        </div></a>
+        <a href="{% url 'student_profile' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/studentmale2134-uejm-200h.png' %}" alt="Students" class="nav-icon">
+          <span>Profile</span>
+        </div></a>
+        
+        <a href="{% url 'student_attendance' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/attendance7018-1v4-200h.png' %}" alt="Attendance" class="nav-icon">
+          <span>Attendance</span>
+        </div></a>
+        
+        <a href="{% url 'student_quiz' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/quiz2134-ijk5-200h.png' %}" alt="Quiz" class="nav-icon">
+          <span>Quiz</span>
+        </div></a>
+        
+        <a href="{% url 'student_exam' %}" style="text-decoration: none;"><div class="nav-button active">
+          <img src="{% static 'public3/external/exam2134-f15t-200w.png' %}" alt="Exam" class="nav-icon">
+          <span>Exam</span>
+        </div></a>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header -->
+      <div class="page-header">
+        <img src="{% static 'public3/external/exam2137-tdwn-200w.png' %}" alt="Exam" class="header-icon">
+        <h1>Exam Result</h1>
+        <div class="student-info">
+          <span class="student-name">{{ request.user.get_full_name }}</span>
+          <span class="student-score">Score: {{ exam_result.score }}/{{ exam_result.exam.total_points }}</span>
+        </div>
+      </div>
+      
+      <div class="divider"></div>
+      
+      <!-- Exam Info -->
+      <div class="exam-info-card">
+        <h2>{{ exam_result.exam.title }}</h2>
+        <div class="exam-meta">
+          <span>Total Questions: {{ exam_result.exam.total_questions }}</span>
+          <span>Time Limit: {{ exam_result.exam.time_limit }} minutes</span>
+          <span>Due Date: {{ exam_result.exam.due_date|date:"F j, Y" }}</span>
+          <span>Date Taken: {{ exam_result.date_taken|date:"F j, Y g:i A" }}</span>
+        </div>
+      </div>
+      
+      <!-- Question Container -->
+      <div class="question-container" id="questionContainer">
+        {% for answer in answers %}
+        <div class="question-card">
+          <h3>Question {{ forloop.counter }}</h3>
+          <p class="question-text">{{ answer.question.content }}</p>
+          
+          {% if answer.question.question_type == 'multiple_choice' %}
+            <div class="options-container">
+              {% for choice in answer.question.choices.all %}
+                <div class="option {% if choice == answer.selected_choice %}selected{% endif %} {% if choice.is_correct %}correct{% endif %}">
+                  <div class="option-indicator"></div>
+                  <span>{{ choice.text }}</span>
+                  {% if choice == answer.selected_choice %}
+                    {% if choice.is_correct %}
+                      <span class="correct-label">Correct</span>
+                    {% else %}
+                      <span class="incorrect-label">Incorrect</span>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="answer-container">
+              <div class="student-answer">
+                <h4>Your Answer:</h4>
+                <p>{{ answer.answer_text }}</p>
+              </div>
+              {% if answer.is_graded %}
+                <div class="grading-result">
+                  <h4>Result:</h4>
+                  <p class="{% if answer.is_correct %}correct{% else %}incorrect{% endif %}">
+                    {% if answer.is_correct %}
+                      Correct
+                    {% else %}
+                      Incorrect
+                    {% endif %}
+                  </p>
+                  {% if answer.feedback %}
+                    <div class="feedback">
+                      <h4>Feedback:</h4>
+                      <p>{{ answer.feedback }}</p>
+                    </div>
+                  {% endif %}
+                </div>
+              {% else %}
+                <div class="grading-pending">
+                  <p>Your answer is pending review by the instructor.</p>
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      
+      <div class="result-actions">
+        <a href="{% url 'student_exam' %}" class="btn-back">Back to Exams</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html> 

@@ -1,0 +1,231 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Student Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/student-dashboard.css' %}">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Navigation Sidebar -->
+    <div class="exam-admin-navigation">
+      <div class="logo-container"></div>
+      <div class="nav-buttons-container">
+        <a href="{% url 'student_dashboard' %}" style="text-decoration: none;"><div class="nav-button active" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/dashboardlayout2134-c0wj-200w.png' %}" alt="Dashboard" class="nav-icon">
+          <span>Dashboard</span>
+        </div></a>
+        
+        <a href="{% url 'student_profile' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/studentmale2134-uejm-200h.png' %}" alt="Students" class="nav-icon">
+          <span>Profile</span>
+        </div></a>
+        
+        <a href="{% url 'student_attendance' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/attendance7018-1v4-200h.png' %}" alt="Attendance" class="nav-icon">
+          <span>Attendance</span>
+        </div></a>
+        
+        <a href="{% url 'student_quiz' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/quiz2134-ijk5-200h.png' %}" alt="Quiz" class="nav-icon">
+          <span>Quiz</span>
+        </div></a>
+        
+        <a href="{% url 'student_exam' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/exam2135-e79-200h.png' %}" alt="Exam" class="nav-icon">
+          <span>Exam</span>
+        </div></a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <header class="header">
+        <div class="header-title">
+          <img src="{% static 'public3/external/dashboardlayout2023-tbkt-200w.png' %}" alt="Dashboard">
+          <h1>Student Dashboard</h1>
+        </div>
+        <div class="user-profile">
+          <button class="account-button" onclick="toggleAccountMenu()">
+            <img src="{% if student.profile_picture %}{{ student.profile_picture.url }}{% else %}{% static 'public3/external/testaccount2136-0qlo-200w.png' %}{% endif %}" alt="Account">
+          </button>
+          
+          <!-- Account Dropdown Menu -->
+          <div id="accountMenu" class="account-menu">
+            <a href="{% url 'logout' %}">Logout</a>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-section">
+        <div class="welcome-section">
+          <h2>Welcome {{ student.user.first_name }} {{ student.user.last_name }}!</h2>
+          <p>Welcome to the student dashboard.<br> Here you can manage your profile, attendance, quizzes, and exams.</p>
+        </div>
+        
+        <section class="overview-section">
+          <h3>Overview</h3>
+          <div class="stats-cards">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <img src="{% static 'public3/external/attendance7018-1v4-200h.png' %}" alt="Attendance">
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ attendance_percentage|floatformat:1 }}%</span>
+                <span class="stat-label">Attendance Rate</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon">
+                <img src="{% static 'public3/external/studentmale7324-4qi-200h.png' %}" alt="Present">
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ present_count }}</span>
+                <span class="stat-label">Present</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon">
+                <img src="{% static 'public3/external/studentmale7324-4qi-200h.png' %}" alt="Absent">
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ absent_count }}</span>
+                <span class="stat-label">Absent</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon">
+                <img src="{% static 'public3/external/studentmale7324-4qi-200h.png' %}" alt="Late">
+              </div>
+              <div class="stat-content">
+                <span class="stat-number">{{ late_count }}</span>
+                <span class="stat-label">Late</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="calendar-section">
+          <h3>Calendar</h3>
+          <div class="calendar-widget" id="calendar">
+            <!-- Calendar will be inserted here by JavaScript -->
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript embedded directly -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Navigation functionality
+      const navButtons = document.querySelectorAll('.nav-button');
+      
+      navButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // Remove active class from all buttons
+          navButtons.forEach(btn => btn.classList.remove('active'));
+          
+          // Add active class to clicked button
+          this.classList.add('active');
+          
+          // Log page
+          const page = this.getAttribute('data-page');
+          console.log(`Loading page: ${page}`);
+        });
+      });
+
+      // Calendar functionality
+      function renderCalendar() {
+        const calendarEl = document.getElementById('calendar');
+        const today = new Date();
+        const currentMonth = today.getMonth();
+        const currentYear = today.getFullYear();
+        
+        // Get first day of month and total days in month
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        
+        // Get days from previous month to display
+        const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
+        
+        // Calendar HTML
+        let calendarHTML = `
+          <div class="calendar-header">
+            <div class="calendar-title">${new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}</div>
+            <div class="calendar-nav">
+              <button id="prev-month"><i class="fas fa-chevron-left"></i></button>
+              <button id="next-month"><i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
+          <div class="calendar-grid">
+            <div class="calendar-day-header">Sun</div>
+            <div class="calendar-day-header">Mon</div>
+            <div class="calendar-day-header">Tue</div>
+            <div class="calendar-day-header">Wed</div>
+            <div class="calendar-day-header">Thu</div>
+            <div class="calendar-day-header">Fri</div>
+            <div class="calendar-day-header">Sat</div>
+        `;
+        
+        // Previous month days
+        for (let i = firstDay - 1; i >= 0; i--) {
+          calendarHTML += `<div class="calendar-day other-month">${prevMonthDays - i}</div>`;
+        }
+        
+        // Current month days
+        for (let i = 1; i <= daysInMonth; i++) {
+          const isToday = i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+          calendarHTML += `<div class="calendar-day ${isToday ? 'today' : ''}">${i}</div>`;
+        }
+        
+        // Next month days (to fill the grid)
+        const totalCells = firstDay + daysInMonth;
+        const remainingCells = totalCells <= 35 ? 35 - totalCells : 42 - totalCells;
+        
+        for (let i = 1; i <= remainingCells; i++) {
+          calendarHTML += `<div class="calendar-day other-month">${i}</div>`;
+        }
+        
+        calendarHTML += `</div>`;
+        calendarEl.innerHTML = calendarHTML;
+        
+        // Add event listeners to navigation buttons
+        document.getElementById('prev-month')?.addEventListener('click', () => {
+          console.log('Previous month clicked');
+        });
+        
+        document.getElementById('next-month')?.addEventListener('click', () => {
+          console.log('Next month clicked');
+        });
+      }
+      
+      // Initialize calendar
+      renderCalendar();
+    });
+
+    // Toggle account menu
+    function toggleAccountMenu() {
+      const menu = document.getElementById('accountMenu');
+      menu.classList.toggle('active');
+    }
+
+    // Close account menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const accountMenu = document.getElementById('accountMenu');
+      const accountButton = document.querySelector('.account-button');
+      
+      if (!accountButton.contains(event.target) && !accountMenu.contains(event.target)) {
+        accountMenu.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Student Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+  <link rel="stylesheet" href="{% static 'css/student-quiz-take.css' %}">
+</head>
+<body>
+  <div class="exam-responses-admin-container">
+    <!-- Navigation Sidebar -->
+    <div class="exam-admin-navigation">
+      <div class="logo-container"></div>
+      <div class="nav-buttons-container">
+        <a href="{% url 'student_dashboard' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/dashboardlayout2136-pwh-200w.png' %}" alt="Dashboard" class="nav-icon">
+          <span>Dashboard</span>
+        </div></a>
+        <a href="{% url 'student_profile' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/studentmale2134-uejm-200h.png' %}" alt="Students" class="nav-icon">
+          <span>Profile</span>
+        </div></a>
+        <a href="{% url 'student_attendance' %}" style="text-decoration: none;"></a><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/attendance7018-1v4-200h.png' %}" alt="Attendance" class="nav-icon">
+          <span>Attendance</span>
+        </div></a>
+        <a href="{% url 'student_quiz' %}" style="text-decoration: none;"></a><div class="nav-button active">
+          <img src="{% static 'public3/external/quiz2137-2g3-200h.png' %}" alt="Quiz" class="nav-icon">
+          <span>Quiz</span>
+        </div></a>
+        <a href="{% url 'student_exam' %}" style="text-decoration: none;"><div class="nav-button" style="border:  #854BAB 1px solid;">
+          <img src="{% static 'public3/external/exam2137-tdwn-200w.png' %}" alt="Exam" class="nav-icon">
+          <span>Exam</span>
+        </div></a>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header -->
+      <div class="page-header">
+        <img src="{% static 'public3/external/quiz2137-3uc7-200h.png' %}" alt="Quiz" class="header-icon">
+        <h1>{{ quiz.title }} - {{ quiz.subject.name }}</h1>
+      </div>
+      
+      <div class="divider"></div>
+      
+      <!-- Exam Info -->
+      <div class="exam-info-card">
+        <h2>{{ quiz.title }}</h2>
+        <div class="exam-meta">
+          <span>Total Questions: {{ quiz.total_questions }}</span>
+          <span>Time Limit: {{ quiz.time_limit }} minutes</span>
+          <span>Due Date: {{ quiz.due_date|date:"F j, Y" }}</span>
+        </div>
+        <p class="exam-instructions">{{ quiz.description }}</p>
+      </div>
+      
+      <!-- Question Container -->
+      <form id="quizForm" method="POST" action="{% url 'submit_quiz' quiz.id %}">
+        {% csrf_token %}
+        <div class="question-container" id="questionContainer">
+          {% for question in questions %}
+          <div class="question-card" data-question-id="{{ question.id }}">
+            <h3>Question {{ forloop.counter }} of {{ quiz.total_questions }}</h3>
+            <p class="question-text">{{ question.content }}</p>
+            {% if question.question_type == 'multiple_choice' %}
+              <div class="options-container">
+                {% for choice in question.choices.all %}
+                <div class="option">
+                  <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}" id="choice_{{ choice.id }}">
+                  <label for="choice_{{ choice.id }}">{{ choice.text }}</label>
+                </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="answer-container">
+                <textarea name="question_{{ question.id }}" class="short-answer-input" placeholder="Type your answer here..."></textarea>
+              </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        
+        <!-- Navigation Buttons -->
+        <div class="question-nav-buttons">
+          <button type="button" class="btn btn-outline" id="prevBtn">Previous Question</button>
+          <button type="button" class="btn btn-primary" id="nextBtn">Next Question</button>
+          <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">Submit Quiz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Current question index
+    let currentQuestionIndex = 0;
+    const totalQuestions = {{ quiz.total_questions }};
+
+    // DOM Elements
+    const questionContainer = document.getElementById('questionContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const questionCards = document.querySelectorAll('.question-card');
+
+    // Show first question and hide others
+    function showQuestion(index) {
+      questionCards.forEach((card, i) => {
+        card.style.display = i === index ? 'block' : 'none';
+      });
+      
+      // Update button states
+      prevBtn.disabled = index === 0;
+      nextBtn.style.display = index === totalQuestions - 1 ? 'none' : 'block';
+      submitBtn.style.display = index === totalQuestions - 1 ? 'block' : 'none';
+    }
+
+    // Event listeners
+    prevBtn.addEventListener('click', () => {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        showQuestion(currentQuestionIndex);
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentQuestionIndex < totalQuestions - 1) {
+        currentQuestionIndex++;
+        showQuestion(currentQuestionIndex);
+      }
+    });
+
+    // Show first question
+    showQuestion(0);
+
+    // Timer functionality
+    const timeLimit = {{ quiz.time_limit }} * 60; // Convert to seconds
+    let timeLeft = timeLimit;
+    const timerDisplay = document.createElement('div');
+    timerDisplay.className = 'timer';
+    document.querySelector('.exam-info-card').appendChild(timerDisplay);
+
+    function updateTimer() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerDisplay.textContent = `Time remaining: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+      
+      if (timeLeft <= 0) {
+        document.getElementById('quizForm').submit();
+      } else {
+        timeLeft--;
+        setTimeout(updateTimer, 1000);
+      }
+    }
+
+    updateTimer();
+  </script>
+</body>
+</html>
